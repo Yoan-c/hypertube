@@ -17,10 +17,10 @@ var webpackConfig = merge(config, {
   },
   plugins: [
     extractSASS,
-    new webpack.optimize.UglifyJsPlugin({
+    /*new webpack.optimize.UglifyJsPlugin({
       comments: false,
       compress: { warnings: false }
-    }),
+    }),*/
     new webpack.optimize.OccurenceOrderPlugin(),
     new ManifestPlugin({
       fileName: 'manifest.json'

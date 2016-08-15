@@ -14,13 +14,13 @@ module.exports = {
     fallback: [path.join(__dirname, '../node_modules')]
   },
   module: {
-    preLoaders: [
+    /*preLoaders: [
       {
         test: /\.js$/,
         loader: 'eslint',
         exclude: /(node_modules|libs)/
       }
-    ],
+    ],*/
     loaders: [
       {
         test: /\.scss$/,
