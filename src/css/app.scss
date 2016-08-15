@@ -1,3 +1,5 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:300);
+
 /* Variables
    ========================================================================== */
 
@@ -12,27 +14,22 @@
 }
 
 body {
-    background: url(../img/thumb.jpg);
+    background-color: white
 }
 
-.foo::before {
-  content: "foo on small";
-}
+#content {
 
-@media screen and (min-width: 769px) {
-  .foo::before {
-    content: "foo on medium";
-  }
-}
+    white-space: nowrap;
+    text-align: center;
+    height: 500px;
 
-.bar::before {
-  content: "bar on small";
-}
+    .hello_world {
+        font-family: 'Roboto Condensed', sans-serif;
+        font-size: 84px;
+        margin-top: 50vh;
+        transform: translateY(-50%);
+    }
 
-@media screen and (min-width: 769px) {
-  .bar::before {
-    content: "bar on medium";
-  }
 }
 
 /* Modules

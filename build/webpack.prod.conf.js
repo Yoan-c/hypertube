@@ -3,7 +3,9 @@ var webpack = require('webpack')
 var merge = require('webpack-merge')
 
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var WebpackAssetsManifest = require('webpack-assets-manifest')
+//var WebpackAssetsManifest = require('webpack-assets-manifest')
+
+var ManifestPlugin = require('webpack-manifest-plugin');
 
 var config = require('./webpack.base.conf')
 
@@ -15,13 +17,13 @@ var webpackConfig = merge(config, {
   },
   plugins: [
     extractSASS,
-    /*new webpack.optimize.UglifyJsPlugin({
+    new webpack.optimize.UglifyJsPlugin({
       comments: false,
       compress: { warnings: false }
-    }),*/
+    }),
     new webpack.optimize.OccurenceOrderPlugin(),
-    new WebpackAssetsManifest({
-        output: './dist/manifest.json'
+    new ManifestPlugin({
+      fileName: 'manifest.json'
     })
   ]
 })

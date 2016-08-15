@@ -15,7 +15,7 @@ module.exports = {
   files: [],
   port: 3002,
   // proxy: 'http://localhost:8000', // Pour PHP / Ruby ou autre
-  base: './src',
+  base: './dist',
   support: ['last 2 versions'], // Pour autoprefixer
   forceReload: ['./src/index.html']
 }
