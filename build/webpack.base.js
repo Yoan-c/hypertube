@@ -1,8 +1,8 @@
-var path = require('path')
-var autoprefixer = require('autoprefixer')
-var mqpacker = require("css-mqpacker")
+const path = require('path')
+const autoprefixer = require('autoprefixer')
+const mqpacker = require("css-mqpacker")
 
-var config = require('./config')
+const config = require('./config')
 
 var root = path.resolve(__dirname, '../')
 
@@ -10,31 +10,42 @@ module.exports = {
   entry: config.entry,
   output: config.output,
   resolve: {
-    extensions: ['', '.js', '.vue', '.coffee', '.css', '.scss'],
+    extensions: ['', '.js', '.vue', '.css', '.scss'],
     fallback: [path.join(__dirname, '../node_modules')]
   },
   module: {
-    /*preLoaders: [
+    preLoaders: [
+      {
+        test: /\.vue$/,
+        loader: 'eslint',
+        exclude: /node_modules/
+      },
       {
         test: /\.js$/,
         loader: 'eslint',
         exclude: /(node_modules|libs)/
       }
-    ],*/
+    ],
     loaders: [
       {
-        test: /\.scss$/,
-        loaders: ['style', 'css', 'postcss', 'sass']
-      },
-      {
-        test: /\.css$/,
-        loaders: ['style', 'css', 'postcss']
+        test: /\.vue$/,
+        loader: 'vue'
       },
       {
         test: /\.js$/,
         loader: 'babel',
         include: root,
         exclude: /node_modules|libs/
+      },
+      {
+        test: /\.scss$/,
+        vue: 'scss',
+        loaders: ['css', 'postcss', 'sass']
+      },
+      {
+        test: /\.css$/,
+        vue: 'css',
+        loaders: ['css', 'postcss']
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -54,12 +65,14 @@ module.exports = {
       }
     ]
   },
-  plugins: [],
   eslint: {
-    configFile: path.resolve(root, './.eslintrc'),
     formatter: require('eslint-friendly-formatter')
+  },
+  vue: {
+    loaders: {}
   },
   postcss: function () {
       return [autoprefixer({browsers: config.support}), mqpacker()];
-  }
+  },
+  plugins: []
 }

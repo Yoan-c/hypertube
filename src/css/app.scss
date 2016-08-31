@@ -8,28 +8,9 @@
 * { box-sizing: border-box; }
 
 /* Tools
-    ========================================================================== */
-:fullscreen a {
-    display: flex
-}
-
-body {
-    background-color: white
-}
-
-#content {
-
-    white-space: nowrap;
-    text-align: center;
-
-    .hello_world {
-        font-family: 'Roboto Condensed', sans-serif;
-        font-size: 84px;
-        margin-top: 50vh;
-        transform: translateY(-50%);
-    }
-
-}
+   ========================================================================== */
+@import "tools/reset";
+@import "tools/responsive";
 
 /* Modules
    ========================================================================== */
@@ -37,6 +18,11 @@ body {
 
 /* Pages
    ========================================================================== */
+
+body {
+    background-color: white;
+}
+
 // @import "pages/single";
 // @import "pages/single";
 // @import "pages/single";

@@ -1,3 +1,7 @@
-import hw from './component/hello_world'
+import Vue from 'vue'
+import Hello from './component/Hello'
 
-console.log('hello world!')
+new Vue({
+  el: 'body',
+  components: { Hello }
+})

@@ -1,19 +1,9 @@
-require('shelljs/global')
-env.NODE_ENV = 'production'
+const webpack = require('webpack')
 
-var path = require('path')
-var ora = require('ora')
-var webpack = require('webpack')
+const config = require('./webpack.prod')
 
-var config = require('./webpack.prod.conf')
-
-var spinner = ora('building for production...')
-
-spinner.start()
-
-// Webpack
+// Start webpack
 webpack(config, function (err, stats) {
-  spinner.stop()
   if (err) throw err
   process.stdout.write(stats.toString({
       colors: true,
