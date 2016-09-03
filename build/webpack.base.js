@@ -8,7 +8,11 @@ var root = path.resolve(__dirname, '../')
 
 module.exports = {
   entry: config.entry,
-  output: config.output,
+  output: {
+    path: config.asset_path,
+    filename: 'js/[name].js',
+    publicPath: config.asset_url
+  },
   resolve: {
     extensions: ['', '.js', '.vue', '.css', '.scss'],
     fallback: [path.join(__dirname, '../node_modules')]

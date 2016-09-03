@@ -3,7 +3,7 @@ const merge = require('webpack-merge')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
-const ManifestPlugin = require('webpack-manifest-plugin');
+const AssetsPlugin = require('assets-webpack-plugin')
 
 const config = require('./webpack.base')
 
@@ -17,12 +17,12 @@ var webpack_config = merge(config, {
     new webpack.optimize.UglifyJsPlugin({
       comments: false,
       compress: {
-          warnings: false
+        warnings: false
       }
     }),
     new webpack.optimize.OccurenceOrderPlugin(),
-    new ManifestPlugin({
-      fileName: 'manifest.json'
+    new AssetsPlugin({
+      filename: config.output.path + '/../manifest.json'
     })
   ]
 })

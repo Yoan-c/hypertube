@@ -4,12 +4,15 @@
   "description": "",
   "scripts": {
     "dev": "node build/dev-server.js",
-    "build": "rm -rf ./dist && node build/build.js",
-    "test": "webpack-dashboard -- node build/dev-server.js"
+    "build": "rm -rf ./dist && node build/build.js"
+  },
+  "dependencies": {
+    "vue": "^1.0.26"
   },
   "author": "Alexandre Gaspar",
   "license": "MIT",
   "devDependencies": {
+    "assets-webpack-plugin": "^3.4.0",
     "autoprefixer": "^6.3.6",
     "babel-core": "^6.7.4",
     "babel-eslint": "^6.1.2",
@@ -42,7 +45,6 @@
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1",
     "webpack-hot-middleware": "^2.10.0",
-    "webpack-manifest-plugin": "^1.0.1",
     "webpack-merge": "^0.14.0"
   }
 }
