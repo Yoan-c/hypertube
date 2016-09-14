@@ -22,7 +22,7 @@ var webpack_config = merge(config, {
     }),
     new webpack.optimize.OccurenceOrderPlugin(),
     new AssetsPlugin({
-      filename: config.output.path + '/../manifest.json'
+      filename: config.output.path + '/manifest.json'
     })
   ]
 })

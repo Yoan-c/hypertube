@@ -7,7 +7,7 @@
     "build": "rm -rf ./dist && node build/build.js"
   },
   "dependencies": {
-    "vue": "^1.0.26"
+    "vue": "^2.0.0-rc.6"
   },
   "author": "Alexandre Gaspar",
   "license": "MIT",
@@ -38,9 +38,8 @@
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
-    "vue-hot-reload-api": "^2.0.6",
     "vue-html-loader": "^1.2.3",
-    "vue-loader": "^8.5.2",
+    "vue-loader": "^9.4.2",
     "vue-style-loader": "^1.0.0",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1",

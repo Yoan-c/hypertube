@@ -15,7 +15,11 @@ module.exports = {
   },
   resolve: {
     extensions: ['', '.js', '.vue', '.css', '.scss'],
-    fallback: [path.join(__dirname, '../node_modules')]
+    fallback: [path.join(__dirname, '../node_modules')],
+    alias: {
+      components: path.join(__dirname, '../src/components'),
+      vue: 'vue/dist/vue.js'
+    }
   },
   module: {
     preLoaders: [
