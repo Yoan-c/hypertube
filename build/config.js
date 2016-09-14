@@ -9,7 +9,6 @@ module.exports = {
   asset_url: '/assets/',
 
   port: 3002,
-  // proxy: 'http://localhost:8000', // Pour PHP / Ruby ou autre
   base: './src',
   support: ['last 2 versions', 'ie > 8'], // Pour autoprefixer
   forceReload: ['./src/index.html']

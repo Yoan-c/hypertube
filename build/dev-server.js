@@ -30,22 +30,6 @@ var serverOptions = {
   stats: {colors: true}
 }
 
-// Suivant la configuration on passe par le proxy
-if (config.proxy) {
-  serverOptions.proxy = {
-    "*": {
-      target: config.proxy,
-      changeOrigin: true,
-      bypass: function (req, res, proxyOptions) {
-        // On laisse passé les requêtes hot-reload
-        if (req.url.includes('__webpack_hmr')) {
-          return req.url
-        }
-      }
-    }
-  }
-}
-
 var server = new WebpackDevServer(compiler, serverOptions)
 
 // On utilise le hot-middleware
