@@ -20,7 +20,6 @@ var webpack_config = merge(config, {
         warnings: false
       }
     }),
-    new webpack.optimize.OccurenceOrderPlugin(),
     new AssetsPlugin({
       filename: config.output.path + '/manifest.json'
     })
