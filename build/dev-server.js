@@ -9,28 +9,25 @@ const chokidar = require('chokidar')
 const compiler = webpack(webpack_config)
 const hotMiddleware = require("webpack-hot-middleware")(compiler);
 
-// Dès qu'un fichier est modifié on force le reload complet de la page
 var refresh = function (event, path) {
   console.log('* ' + path + ' changed')
   hotMiddleware.publish({action: 'reload'})
 }
 
-// Les options de base de notre dev-server
-var serverOptions = {
-  contentBase: config.base,
+var server = new WebpackDevServer(compiler, {
   hot: true,
   historyApiFallback: false,
   quiet: false,
   noInfo: false,
   publicPath: webpack_config.output.publicPath,
   watchOptions: {
-    aggregateTimeout: 300,
-    poll: 50
+    ignored: /node_module/
   },
-  stats: {colors: true}
-}
-
-var server = new WebpackDevServer(compiler, serverOptions)
+  stats: {
+    chunks: false,
+    colors: true
+  }
+})
 
 // On utilise le hot-middleware
 server.use(hotMiddleware);

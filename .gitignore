@@ -1,5 +1,5 @@
-node_modules
+node_modules/
 npm-debug.log
-dist
-.idea
-.tern-project
+dist/
+
+.idea/
