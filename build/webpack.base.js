@@ -22,7 +22,7 @@ module.exports = {
     }
   },
   module: {
-    preLoaders: [
+    /*preLoaders: [
       {
         test: /\.vue$/,
         loader: 'eslint',
@@ -33,7 +33,7 @@ module.exports = {
         loader: 'eslint',
         exclude: /(node_modules|libs)/
       }
-    ],
+    ],*/
     loaders: [
       {
         test: /\.vue$/,

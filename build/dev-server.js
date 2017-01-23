@@ -15,8 +15,9 @@ var refresh = function (event, path) {
 }
 
 var server = new WebpackDevServer(compiler, {
+  contentBase: './src',
   hot: true,
-  historyApiFallback: false,
+  historyApiFallback: true,
   quiet: false,
   noInfo: false,
   publicPath: webpack_config.output.publicPath,

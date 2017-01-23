@@ -1,0 +1,51 @@
+<template>
+	<div>
+	ok
+	</div>
+</template>
+
+<script>
+import auth from '../app.js'
+export default {
+  data () {
+	 return {
+		 req : "",
+		 log : "log out",
+		answer : [],
+	 }
+  },
+  methods : {
+	page: _.debounce(
+	function () {
+		//let url = this.$http.get
+		//console.log("header " , url)
+		this.$http.get('http://localhost:8080/oauth/42/').then(data =>{
+			console.log("data " , data.data.token)
+			auth.log(data.data.token, "/search")
+		}).catch(err=>{
+			console.log("errr"+ errr)	
+		})
+	},
+	function (){
+		this.$http.get('http://localhost:8080/oauth/google/').then(data =>{
+			console.log("data " , data.data.token)
+			auth.log(data.data.token, "/search")
+		}).catch(err=>{
+			console.log("errr"+ errr)	
+		})
+		
+	}),
+	/*logout : function ()
+		{
+			auth.logout();
+			this.$router.push("/")
+		}*/
+	},
+	mounted : function () {
+		console.log(this.$route.params.state)
+		console.log(this.$http.headers.common)
+		this.page();
+	}
+}
+</script>
+
