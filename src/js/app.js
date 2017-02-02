@@ -1,20 +1,45 @@
 import Vue from 'vue'
 import Hello from './component/Hello'
 import Index from './component/Index'
+import Profile from './component/Profile'
 import Search from './component/Search'
+import Forget from './component/Forget'
+import Error from './component/Error'
+import Reset from './component/Reset'
 import Oauth from './component/Oauth'
 import Film from './component/Film'
 import VueRouter from 'vue-router'
 import VueRessource from 'vue-resource'
+
+let field = require("./field.js")
+window.$ = require('jquery')
 Vue.use(VueRouter)
 Vue.use(VueRessource)
 Vue.http.options.emulateJSON = true;
 
-var path_auto = ["/login", "/oauth/42/callback", "/oauth/google/callback", "/oauth/slack/callback", "/oauth/facebook/callback", "/oauth/github/callback"]
+const default_lang = "EN"
+const tab_lang = ["FR", "EN"]
+var path_auto = ["/login", "/oauth/42/callback", "/oauth/google/callback", "/oauth/slack/callback", "/oauth/facebook/callback", "/oauth/github/callback", "/forget", "/reset"]
 
 const routes =
 	[
 		{ path: '/login', component: Index },
+		{ path: '/profile', component: Profile },
+		{ path: '/error', component: Error },
+		{ path: '/forget', component: Forget },
+		{ path: '/reset', component: Reset , 
+			beforeEnter : (to, from, next) =>{
+				if (to.query.lang)
+					localStorage.setItem("lang", to.query.lang)
+				else
+					localStorage.setItem("lang", "EN")
+				if (to.query.token)
+					next();
+				else
+					router.push("/login")
+						return ;
+			}
+		},
 		{ path: '/oauth/42/callback', component: Oauth },
 		{ path: '/oauth/google/callback', component: Oauth },
 		{ path: '/oauth/slack/callback', component: Oauth },
@@ -40,7 +65,6 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next)=>{
 	let token = window.localStorage.getItem("token")
-	console.log(token)
 
 	if (token)
 	{
@@ -59,7 +83,7 @@ router.beforeEach((to, from, next)=>{
 	}
 	next("/login")
 })
-import auth from "./app.js"
+import auth from "./function.js"
 new Vue ({
 	router,
 	data : {
@@ -70,12 +94,14 @@ new Vue ({
 	},
 	methods : {
 		logout: function() {
-			auth.logout();
-			router.push("/")
+			auth.logout(this);
+			delete Vue.http.headers.common["Authorization"]
+			router.push("/login")
+	//		this.log = auth.i18n("authentication.logout")
 		},
 		check : function() {
-					console.log("fct check")
 			let token = localStorage.getItem("token");
+			this.log = auth.i18n("authentication.logout")
 			return (token) ? true : false;
 		}
 	},
@@ -83,23 +109,33 @@ new Vue ({
 }).$mount('#page')
 
 export default {
-
+	redirect(redirect){
+		router.push(redirect);
+	},
+	add_token(token){
+		localStorage.setItem("token", token)
+	},
+	remove_token(){
+		localStorage.removeItem('token')
+	}
+	/*
 	login(context, redirect){
-		console.log('je fait un ' + context.login, context.password);
 		context.$http.post('http://localhost:8080/login', {create : false, login : context.login, password : context.password}).then(data =>
 			{
+				console.log("data ")
 				if (data.body.token)
 				{
 					window.localStorage.setItem("token", data.body.token)
+					window.localStorage.setItem("lang", data.body.lang)
 					if (redirect)
 						router.push(redirect)
 				}
+				console.log("data ", data.body)
 			}).catch(err =>{
-				console.log("errr")
+				console.log("errr trois ", err)
 			})
 	},
 	log(token, redirect){
-			console.log("TOKEN "+ token)
 		if (token)
 		{
 			console.log("TOKEN "+ token)
@@ -130,13 +166,32 @@ export default {
 	},
 	logout(){
 		localStorage.removeItem('token')
+		delete Vue.http.headers.common["Authorization"]
+		console.log("TEST")
+		router.push("/login")
 	},
 	
 	getAuthHeader(){
 		return {
 			'Authorization' : 'Bearer ' + localStorage.getItem('token')
 		}
-	}
+	},
+	i18n(tab)
+	{
+		let lang = localStorage.getItem("lang");
+		return this._i18n(tab, (lang) ? lang : "EN");
+	},
+	_i18n (tab, lang){
+		let contents = tab.split(".")
+			let content = field.field[lang];
+		for (let index of contents){
+			if (content)
+				content = content[index]
+		}
+			if (!content)
+				return this._i18n(tab, default_lang)
+			return content
+	}*/
 }
 
 

@@ -6,7 +6,8 @@ let whirlpool = require('whirlpool');
 let data = require('./db_hypertube.js');
 var jwt = require('jsonwebtoken');
 let request = require("request");
-
+let mail = require("./mail.js");
+let StreamClient = require('./stream-client')
 let apiArray = []
 apiArray["42"] = {
 	uri_co : "https://api.intra.42.fr/oauth/token",
@@ -52,7 +53,6 @@ apiArray["github"] = {
 
 var fill_data = (result, jwt, state, res) => {
 	data.checkUserOAUTH(result, jwt, state).then(data =>{
-		console.log("auth OK ")
 		let response = {
 			token : data,
 			result : true,
@@ -80,81 +80,193 @@ let server = http.createServer(function (req, res){
 		if (req.headers.authorization)
 		{
 			let token = req.headers.authorization.split(" ")[1]
-			console.log("il y a un token ", token)
-		jwt.verify(token, 'qwerty', function(err, decoded) {
-			  console.log( "TEST DECODE ", decoded) // bar
-			if (err)
-			{
-				console.log("erreur http checkTorrent")
-				res.writeHead(401, {'Content-Type': 'text/html'});
-				res.write('Erreur 401.');
-				res.end()
-			}
-			else
-				if (query == "/search" )
+			let token2
+			token2 = (params["token"])? params["token"] : querystring.parse(url.parse(req.url).query).token;
+			if (token && token2 && token != token2)
+				token = token2
+			console.log("token ", token)
+			jwt.verify(token, 'qwerty', function(err, decoded) {
+				params = querystring.parse(post)
+				console.log("test ", decoded)
+				if (err)
 				{
-					var params = querystring.parse(url.parse(req.url).query);
-					if (params["imdb"] && params["id"] && params["code"])
+					console.log("erreur http checkTorrent")
+					res.writeHead(401, {'Content-Type': 'text/html'});
+					res.write('Erreur');
+					console.log("test")
+					res.end()
+				}
+				else
+					if (query == "/search" )
 					{
-						search.getFile(params["id"], params["code"], params["imdb"]).then((data) => {
-							res.write(JSON.stringify(data));
+						var params = querystring.parse(url.parse(req.url).query);
+						if (params["imdb"] && params["id"] && params["code"])
+						{
+							console.log("IMBD ",data.magnet)
+							search.getFile(params["id"], params["code"], params["imdb"]).then((data) => {
+								console.log("MAGNEEEEEEEEEEETTTTT ",data.magnet)
+								res.write(JSON.stringify(data));
+								res.end();
+							})
+						}
+						else if (params["name"])
+						{
+							search.getFile_by_tag(params["name"]).then((resultat) => {
+								data.get_Film_User(decoded).then((result)=>{
+									console.log("retour")
+									res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
+									res.end();
+								}).catch(err=>{
+									res.write(JSON.stringify(err));
+									res.end();
+								})
+							
+							
+							})
+						}
+						else if (params && Number(params['av']) && params['av'] == 1)
+						{
+							console.log(params)
+							search.advance(params).then(resultat =>{
+								data.get_Film_User(decoded).then((result)=>{
+									console.log("retour")
+									if (resultat == "FIN")
+										res.write(JSON.stringify({"ret" : resultat}));
+									else 
+										res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
+									res.end();
+								}).catch(err=>{
+									res.write(JSON.stringify(err));
+									res.end();
+								})
+							}).catch(err=>{
+								console.log("rien trouve")
+								if (err == "fin")
+								res.write(JSON.stringify({status : false}));
 							res.end();
-						})
+							})
+						}
+						else
+						{
+							console.log("ICI SEARCH", params["page"])
+							if (!params["page"])
+								params["page"] = '1'
+							search.getFile_by_page(Number(params["page"])).then((resultat) => {
+								data.get_Film_User(decoded).then((result)=>{
+									console.log("retour")
+									res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
+									res.end();
+								}).catch(err=>{
+									res.write(JSON.stringify(err));
+									res.end();
+								})
+							}).catch(error=>{
+									res.write(JSON.stringify(error));
+									res.end();
+								
+							})
+						}
 					}
-					else if (params["name"])
+					else if (query == "/info_profile")
 					{
-						search.getFile_by_tag(params["name"]).then((data) => {
-							res.write(JSON.stringify(data));
-						res.end();
-						})
+						if (params['modif'] == "false")
+						{
+							console.log(":A")
+							data.getProfile(decoded).then((data) =>{
+								console.log("Data profile " , data)
+								res.write(JSON.stringify(data));
+								res.end();
+							}).catch(err=>{
+								console.log("erreur "+ err)
+								res.end();
+							})
+						}
+						else
+						{
+							console.log(":BBBBBBBBBBBBBBBBBBB")
+							if (params["password"])
+								params["password"] = whirlpool(params["password"])
+							data.setProfile(decoded, params, jwt).then(data =>{
+								console.log("Modification success" + data)
+								let response = {
+									token : data,
+									result : true,
+									status : true
+								}
+								res.write(JSON.stringify(response));
+								res.end();
+							}).catch(err=>{
+								console.log("Modification failed " + err)
+								res.write(JSON.stringify(err));
+								res.end();
+							})
+						}
+					}
+					else if (query == "/see")
+					{
+						if (params && params["magnet[]"], params['code'] && params['imdb'] && params['id'])
+						{
+
+							//console.log(params["magnet[]"][0])
+							console.log(params, decoded)
+							/*let magnet = params["magnet[]"][0]
+							let client = new StreamClient()
+							client.add(magnet)
+							client.on("message", data=>{
+								console.log("message ", data)
+							})
+							client.on("err", data=>{
+								console.log("error ", data)
+							})*/
+							data.addFilm(params, decoded).then(data=>{
+							console.log("data FILm ", data)
+							}).catch(err=>{
+								console.log("err FILM ", err)
+							})
+							
+						}
+							res.end()
 					}
 					else
 					{
-						search.getFile_by_page(0).then((data) => {
-							res.write(JSON.stringify(data));
-						res.end();
-						})
+						res.writeHead(401, {'Content-Type': 'text/html'});
+						res.write('Erreur 401.');
+						res.end()
 					}
-				}
-				else
-				{
-					res.writeHead(401, {'Content-Type': 'text/html'});
-					res.write('Erreur 401.');
-					res.end()
-				}
-		});
+			});
 		}
 		else
 		{
 			if (query == "/login")
 			{
+				console.log(params)
 				if (params.login && params.password)
 				{
 					let password = whirlpool(params.password)
 					if (params.create == "false")
 					{
 						data.userAutentication(params.login, password, jwt).then((data)=>{
-							let token = jwt.sign({username : data}, "qwerty");
+							//let token = jwt.sign({username : data}, "qwerty");
+							console.log(data)
 							let response = {
-								token: data,
+								token: data.token,
+								lang: data.lang,
 								status: true
 							}
-								console.log("connecte ")
 							res.write(JSON.stringify(response))
 							res.end()
 						}).catch((err) =>{
-							console.log("ERR "+err)
+							console.log("err")
+							res.write(JSON.stringify({status : false, "err" : err}))
 							res.end()
 						})
 					}
 					else
 					{
-						params.token = jwt.sign({username : data}, "qwerty");
 						params.password = whirlpool(params.password)
-						data.createUser(params).then(data=>{
+						data.createUser(params, jwt).then(data=>{
 							let response = {
-								data : data,
-								token : params.token,
+								token : data,
 								result : true,
 								status : true
 							}
@@ -171,6 +283,63 @@ let server = http.createServer(function (req, res){
 						})
 					}
 				}
+				else
+					res.end()
+			}
+			else if (query == "/reset")
+			{
+				if (params['login'] && params['mail'])
+				{
+					data.reset(params, jwt).then(data=>{
+						mail.sendMail(params, data).then(response=>{
+							console.log("email send")
+							res.write(JSON.stringify({status : "ok"}))
+							res.end()
+							
+						}).catch(err =>{
+							console.log("email not send", err)
+							res.end()
+							
+						})
+					}).catch(err=>{
+						console.log("erreur reset http ", err)
+						res.end()
+					})
+				}
+				else
+				{
+					res.write(JSON.stringify({"erreur" : "erreur", "login" : params['login'], "email" : params['mail']}))
+					res.end()
+				}
+			}
+			else if (query == "/resetMdp")
+			{
+				if (params["mdp"] && params["token"])
+				{
+					params["mdp"] = whirlpool(params["mdp"])
+					data.resetPass(params, jwt).then(data=>{
+						res.write(JSON.stringify({"token" : data}))
+						res.end()
+					}).catch(err=>{
+						console.log("erreur ", err)
+						res.write(JSON.stringify({"token" : ""}))
+						res.end()
+					})
+				}
+				else
+					res.end()
+			}
+			else if (query == "/verify")
+			{
+				if (params["token"])
+					data.verify(params["token"], jwt).then(data=>{
+						console.log("ici", data)
+						res.write(JSON.stringify({"success" : data}))
+						res.end()
+					}).catch(err=>{
+						res.write(JSON.stringify({"success" : data}))
+						res.end()
+					})
 				else
 					res.end()
 			}
@@ -205,7 +374,6 @@ let server = http.createServer(function (req, res){
 									method : "GET",
 								}, (err, resp, result2)=>{
 									let resultat = JSON.parse(result);
-									console.log("RESUTAT email" + result2)
 									try {
 										resultat.email = JSON.parse(result2)[0].email
 									}catch (e)

@@ -1,6 +1,6 @@
 let parseTorrent = require("parse-torrent");
 let PirateBay = require("thepiratebay");
-let subtitle = require("yifysubs");
+let subtitle = require("./yify.js");
 let RequestClient = require("reqclient").RequestClient;
 let File_info = require('imdb-api');
 let http = require("http");
@@ -15,7 +15,6 @@ let YTS = new RequestClient ({
 });
 
 var maxYTS = 0;
-
 
 let Info_file = {
 	"year" : "0",
@@ -94,7 +93,7 @@ function getSubtitle(IMDB)
 	})
 }
 
-function Fill_infoFile(val)
+function Fill_infoFile(val, code)
 {
 	Info_file.released = new Date(val.released);
 	Info_file.title = val.title;
@@ -108,7 +107,7 @@ function Fill_infoFile(val)
 	Info_file.actors = val.actors;
 	Info_file.country = val.country;
 	Info_file.imdb_code = val.imdbid;
-	if (!Info_file.magnet)
+	if (code == "Y")
 	{
 		console.log("INFO MAGNET " + Object.keys(Info_file.torrents).length)
 		let nb_torrent = Object.keys(Info_file.torrents).length
@@ -132,7 +131,6 @@ function getFile(id, code, IMDB)
 		var reg = /^tt\d{7}$/
 		let reg2 = /tt\d{7}/
 		//let id = parseInt(IMDB, 10);
-			console.log(code, id)
 		if (reg.exec(IMDB) && code == "Y" && id)
 		{
 			console.log("test")
@@ -153,9 +151,8 @@ function getFile(id, code, IMDB)
 					Info_file.seeders = res.data.movies[0].torrents[0].seeds;
 					Info_file.leechers = res.data.movies[0].torrents[0].peers;
 					File_info.getById(IMDB).then( (val) => {
-						Fill_infoFile(val)
+						Fill_infoFile(val, "Y")
 						getSubtitle(IMDB)
-						console.log("RETURN")
 						return response(Info_file);
 					});
 				}
@@ -163,7 +160,6 @@ function getFile(id, code, IMDB)
 		}
 		else if (IMDB && code == "P" && id)
 		{
-			console.log("ENTRE DANS PIRATE")
 			PirateBay.getTorrent(id, {
 				category: "video"
 			}).then(data => {
@@ -181,7 +177,7 @@ function getFile(id, code, IMDB)
 					IMDB = IMDB[0]
 					Info_file.imdb_code = IMDB;
 					File_info.getById(IMDB).then( (val) => { 
-						Fill_infoFile(val)
+						Fill_infoFile(val, "P")
 						getSubtitle(IMDB)
 						Info_file.img = val.poster;
 						return response(Info_file)
@@ -377,6 +373,78 @@ function getFile_by_tag(name){
 	})
 }
 
+
+function advance(params){
+
+	return new Promise((response, error) =>{
+		let tabFile = []
+		let genre = (params['genre']) ? params['genre'] : 0
+		let minNote = (params['minNote']) ? params['minNote'] : 0
+		let maxNote = (params['maxNote']) ? params['maxNote'] : 10
+		let minAnnee = (params['minAnnee']) ? params['minAnnee'] : 0
+		let maxAnnee = (params['maxAnnee']) ? params['maxAnnee'] : -1
+		let nom = (params['nom']) ? params["nom"] : 0
+		let sort = (params['sort']) ? params["sort"] : 0
+		let order = (params['order']) ? params["order"] : 0
+		let page = (params['page']) ? params["page"] : 0
+		let resp = YTS.get({ "uri" : "list_movies.json",
+			"query" : {
+				"genre" : genre,
+				"minimum_rating" : minNote,
+				"query_term" : nom,
+				"sort_by" : sort,
+				"order_by" : order,
+				"limit" : 50,
+				"page" : page
+			}
+		}).then(res=>{
+			var i = 0;
+			if (res && res.data.movies)
+			{
+				for (let j = 0; j < res.data.movies.length; j++)
+				{
+					let elem = res.data.movies[j];
+					if (elem.rating >= minNote && elem.rating <= maxNote)
+					{
+						if (Number(elem.year) >= Number(minAnnee) && Number(elem.year) <= Number((maxAnnee < 0)? elem.year : maxAnnee))
+						{
+							console.log("entre", elem.rating , elem.year, elem.title, elem.genres)
+							tabFile.push({
+								id : elem.id,
+								title : elem.title,
+								imdb_code : elem.imdb_code,
+								note : elem.rating,
+								small_img : elem.small_cover_image,
+								medium_img : elem.medium_cover_image,
+								large_img : elem.large_cover_image,
+								img : elem.medium_cover_image,
+								code : "Y",
+								year : elem.year
+							})
+						}
+					}
+				}
+				console.log("test ",tabFile.length)
+				if (tabFile.length <= 0)
+				{
+					if ((res.data.movie_count / page) < 50)
+					{
+						console.log("FFFFFFFFFFFFFFIIIIIIIIIIIIINNNNNNNNNNNNNNNN")
+						response("FIN")
+					}
+					else
+						error(tabFile)
+				}
+				else
+					response(tabFile)
+			}
+		})
+	
+	})
+
+}
+
 exports.getFile = getFile;
 exports.getFile_by_page = getFile_by_page;
 exports.getFile_by_tag = getFile_by_tag;
+exports.advance = advance;

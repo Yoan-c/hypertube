@@ -21,7 +21,7 @@
 
 <body>
 	<div id="page">
-		<router-link to="/search">go</router-link>
+		<router-link to="/search" v-show="check()">go</router-link>
 		<button @click="logout()" v-show="check()">{{log}}</button>
 		<router-view></router-view>
 	</div>

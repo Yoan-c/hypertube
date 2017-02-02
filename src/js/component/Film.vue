@@ -1,11 +1,11 @@
 <template>
 			{{msg}}
-	<div id="content" style="background-color:black">
-		<div style="background-color: yellow;">
-			<div style="width: 20%; background-color: pink">
+	<div id="content">
+		<div>
+			<div>
 				<img v-bind:src=tab.img />
 			</div>
-			<div style="width: 30%; background-color: red">
+			<div>
 				{{title}}<br/>
 				{{info}}<br/>
 				{{director}}<br/>
@@ -19,11 +19,14 @@
 			<p style="color: blue;" v-for="value in comments"> {{value}} </p>
 			<textarea v-model="comment" placeholder="comment"></textarea>
 			 <button v-on:click="add">Add </button>
+			 <button v-on:click="voir">voir </button>
 		</div>
 	</div>
 </template>
 
 <script>
+import auth from '../function'
+import app from '../app.js'
 export default {
 	data () {
 		return {
@@ -47,34 +50,46 @@ export default {
 		}
 	},
 	methods: {
-	search: _.debounce(
-	function () {
-		var vm = this
-		console.log(this.imdb_code)
-		vm.$http.get('http://localhost:8080/search', {params : {imdb : this.imdb, code : this.code, id : this.id}} ).then((response) =>{
-			response.json().then((res)=>{
-				this.tab = res
-				this.title = res.title
-				this.released = res.released
-				this.time = res.time
-				this.genre = res.genre
-				this.director = "Director : "+res.director
-				this.actors = "Actors : "+res.actors
-				this.writer = "Writer : "+res.writer
-				this.resume = res.resume
-				this.note = res.note+"/10"
-				this.info = this.released+" / "+this.time+" / "+this.genre
-				console.log(res);
+		search: _.debounce(
+		function () {
+			var vm = this
+			console.log(this.imdb_code)
+			let token = window.localStorage.getItem("token")
+			vm.$http.get('http://localhost:8080/search', {params : {imdb : this.imdb, code : this.code, id : this.id, token : token}} ).then((response) =>{
+				response.json().then((res)=>{
+					this.tab = res
+					this.title = res.title
+					this.released = res.released
+					this.time = res.time
+					this.genre = res.genre
+					this.director = "Director : "+res.director
+					this.actors = "Actors : "+res.actors
+					this.writer = "Writer : "+res.writer
+					this.resume = res.resume
+					this.note = res.note+"/10"
+					this.info = this.released+" / "+this.time+" / "+this.genre
+					console.log("resr ",res.magnet);
+				});
+			}, (response) =>{
+		//		console.log(response)
+				this.tab = response
+				auth.logout();
+				app.redirect("/login")
 			});
-	}, (response) =>{
-		console.log(response)
-			this.tab = response
-		});
-	}),
-	add : function () {
-		this.comments.push(this.comment);
-		this.comment = ""
-	}
+		}),
+		add : function () {
+			this.comments.push(this.comment);
+			this.comment = ""
+		},
+		voir : function (){
+			console.log(this.tab.magnet)
+			let token = window.localStorage.getItem("token")
+			this.$http.post("http://localhost:8080/see", {magnet : this.tab.magnet , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
+				console.log("data seen", data)
+			}).catch(err=>{
+				console.log("erreur seen", err)
+			})
+		}
 	},
 	beforeMount : function () {
 		this.imdb = this.$route.params.imdb
