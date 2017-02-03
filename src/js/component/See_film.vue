@@ -16,21 +16,9 @@
 			</div>
 		</div>
 		<div>
-			 <div v-if="see">
-				<video width="480" controls crossorigin="anonymous">
-					<source :src=lien>
-						<track v-for="(item, i) in sub" kind="subtitles" :srclang ="i" :label ="i" :src="'http://localhost:8080/subtitles/'+imdb+'/'+i+'/'+item[0]" crossorigin="anonymous">
-			 	</video>
-			 </div>
 			<p style="color: blue;" v-for="value in comments"> {{value.login}} {{value.comment}} </p>
 			<textarea v-model="comment" placeholder="comment"></textarea>
-			<button v-on:click="add">Add </button><br/>
-			<li v-for="(item, i) in torrent">
-		   	<input type="radio" id="i" v-bind:value="i" v-model="picked">
-			<label for="one">{{item.quality}}</label>
-			 <br>
-			 <em>seeds : {{item.seeds}} peers : {{item.peers}}</em>
-			</li>	
+			 <button v-on:click="add">Add </button>
 			 <button v-on:click="voir">voir </button>
 		</div>
 	</div>
@@ -43,12 +31,9 @@ export default {
 	data () {
 		return {
 			msg : "testa",
-			see : false,
-			lien : "",
 			imdb: "",
 			id : "",
 			code : "",
-			picked : 0,
 			tab : [],
 			title : "",
 			released : "",
@@ -61,8 +46,6 @@ export default {
 			note : "",
 			info : "",
 			comments : [],
-			torrent : [],
-			sub : [],
 			comment : ""
 		}
 	},
@@ -85,8 +68,7 @@ export default {
 					this.resume = res.resume
 					this.note = res.note+"/10"
 					this.info = this.released+" / "+this.time+" / "+this.genre
-					this.torrent = res.torrents
-					console.log("resr ",res.torrents);
+					console.log("resr ",res.film);
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
 						this.comments.push({"comment" : elem.comment, "login" : elem.login})
@@ -104,28 +86,11 @@ export default {
 			this.comments.push(this.comment);
 			this.comment = ""
 		},
-		sub : function (en)
-		{
-			console.log("en ",en)
-		},
 		voir : function (){
+			console.log(this.tab.magnet)
 			let token = window.localStorage.getItem("token")
-			this.$http.post("see", {magnet : this.tab.magnet[this.picked] , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
+			this.$http.post("see", {magnet : this.tab.magnet , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
 				console.log("data seen", data)
-				if (data && data.body && data.body.data)
-				{
-					this.$http.get("subtitle", {params : {imdb : this.imdb, token : token}}).then(res=>{
-					
-					console.log("test ", res)
-					this.sub = res.body
-						this.lien = "http://"+data.body.data.url
-					this.see = true
-					}).catch(err=>{
-						console.log("erreur ", err)
-					})
-				}
-				else
-					return
 			}).catch(err=>{
 				console.log("erreur seen", err)
 			})
@@ -134,7 +99,6 @@ export default {
 	mounted : function () {
 		this.comments = []
 		this.comment = "" 
-		this.see = false
 		this.imdb = this.$route.params.imdb
 		this.code = this.$route.params.code
 		this.id = this.$route.params.id

@@ -8,6 +8,7 @@ import Error from './component/Error'
 import Reset from './component/Reset'
 import Oauth from './component/Oauth'
 import Film from './component/Film'
+import See_film from './component/See_film'
 import Users from './component/Users'
 import VueRouter from 'vue-router'
 import VueRessource from 'vue-resource'
@@ -60,6 +61,14 @@ const routes =
 		{ path: '/oauth/github/callback', component: Oauth },
 		{ path: '/search', alias: '/', component: Search },
 		{ path: '/users', component: Users },
+	/*	{ path: '/See_film/:data', component: See_film, 
+			beforeEnter : (to, from, next)=>{
+				if (to.params && to.params.data)
+					next();
+				else
+					next(false);
+			}
+		},*/
 		{ path: '/search/:imdb/:id/:code', component: Film,
 			beforeEnter : (to , from, next) =>{
 				let reg = /^tt\d{7}$/

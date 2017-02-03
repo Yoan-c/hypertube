@@ -8,7 +8,14 @@ var jwt = require('jsonwebtoken');
 let request = require("request");
 let mail = require("./mail.js");
 let StreamClient = require('./stream-client')
+let path = require('path');
+let fs = require('fs');
+
 let apiArray = []
+var mimeTypes = {
+	 "html": "text/html",
+	};
+
 apiArray["42"] = {
 	uri_co : "https://api.intra.42.fr/oauth/token",
 	client_id : "8a8c56a0edca0a04a3e1b89b70ba2a4b79f03f2c07784856a8d21d89547d9039",
@@ -69,7 +76,22 @@ let server = http.createServer(function (req, res){
 	res.setHeader("Access-Control-Allow-Origin", "*");
 	res.setHeader("Content-Type", "application/json");
 	res.setHeader("Access-Control-Allow-Headers","Origin, Authorization, X-Requested-With, Content-Type, Accept");
+	
 	let query = url.parse(req.url).pathname;
+/*	var filename = path.join(process.cwd(), query);
+	fs.access(filename, function(exists) {
+		if(!exists) {
+			console.log("not exists: " + filename);
+		res.writeHead(200, {'Content-Type': 'text/plain'});
+		res.write('404 Not Found\n');
+			res.end();
+		}
+		var mimeType = mimeTypes[path.extname(filename).split(".")[1]];
+		res.writeHead(200, "text/plain");
+		var fileStream = fs.createReadStream(filename);
+		fileStream.pipe(res);
+	});
+*/	
 	let post = ''
 	req.setEncoding('utf8')
 	req.on("data", data => {
@@ -194,7 +216,6 @@ let server = http.createServer(function (req, res){
 						}
 						else
 						{
-							console.log(":BBBBBBBBBBBBBBBBBBB")
 							if (params["password"])
 								params["password"] = whirlpool(params["password"])
 							data.setProfile(decoded, params, jwt).then(data =>{
@@ -224,31 +245,67 @@ let server = http.createServer(function (req, res){
 						else
 							res.end()
 					}
+					else if (query == "/subtitle")
+					{
+						params = querystring.parse(url.parse(req.url).query);
+						search.search_sub(params, path).then(data=>{
+							console.log("data ", data)
+								res.write(JSON.stringify(data));
+							res.end()
+						})
+					}
 					else if (query == "/see")
 					{
-						if (params && params["magnet[]"], params['code'] && params['imdb'] && params['id'])
+						if (params && params["magnet"], params['code'] && params['imdb'] && params['id'])
 						{
 
-							//console.log(params["magnet[]"][0])
-							/*let magnet = params["magnet[]"][0]
+							console.log(params["magnet"])
+							let magnet = params["magnet"]
 							let client = new StreamClient()
 							client.add(magnet)
 							client.on("message", data=>{
 								console.log("message ", data)
+								res.write(JSON.stringify({"data" : data}));
+								res.end();
 							})
 							client.on("err", data=>{
 								console.log("error ", data)
-							})*/
+								res.write(JSON.stringify({"err" : data}));
+								res.end();
+							})
 							data.addFilm(params, decoded).then(data=>{
 							}).catch(err=>{
 								console.log("err FILM ", err)
+								res.write(JSON.stringify({"err" : data}));
+								res.end();
 							})
 							
 						}
-							res.end()
+						else
+							res.end();
 					}
 					else
 					{
+						/*query = url.parse(req.url).pathname;
+						var filename = path.join(process.cwd(), query);
+							console.log('request for', filename);
+						fs.exists(filename, function(exists) {
+							if(!exists) {
+								console.log("not exists: " + filename);
+								res.writeHead(200, {'Content-Type': 'text/plain'});
+								res.write('404 Not Found\n');
+								res.end();
+								return 
+							}
+
+							console.log('Found');
+
+							res.writeHead(200, "text/plain");
+							var fileStream = fs.createReadStream(filename);
+							fileStream.pipe(res);
+							res.write(JSON.stringify(response))
+						});
+						*/
 						res.writeHead(401, {'Content-Type': 'text/html'});
 						res.write('Erreur 401.');
 						res.end()
@@ -405,8 +462,30 @@ let server = http.createServer(function (req, res){
 						})
 				 })
 			}
-			else
-				res.end()
+			else{
+
+						query = url.parse(req.url).pathname;
+						query = querystring.unescape(query)
+				var filename = path.join(process.cwd(), query);
+							console.log('request for', filename);
+						fs.exists(filename, function(exists) {
+							if(!exists) {
+								console.log("not exists: " + filename);
+								res.writeHead(200, {'Content-Type': 'text/plain'});
+								res.write('404 Not Found\n');
+								res.end();
+								return 
+							}
+
+							console.log('Found');
+
+							res.writeHead(200, "text/plain");
+							var fileStream = fs.createReadStream(filename);
+							fileStream.pipe(res);
+						});
+
+//				res.end()
+			}
 		}
 	})
 })

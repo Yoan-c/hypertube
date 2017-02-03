@@ -444,6 +444,44 @@ function advance(params){
 
 }
 
+exports.search_sub = (params, path) =>{
+	let imdb = params['imdb']
+	const Paths = 'subtitles/' + imdb
+	const lang = ['en', 'fr']
+	let tab = [];
+	return new Promise ((yes , no) =>{
+		var filename = path.join(process.cwd(), Paths);
+		fs.exists(filename, exists => {
+				if(!exists) {
+					yes("") 
+				}
+			new Promise ((response, error) =>{
+				let lang_path = path.join(filename, 'en') 
+				fs.exists(lang_path, exists => {
+					if(!exists) return response("")
+					fs.readdir(lang_path, (err, files) => {
+					response(files)
+					})
+				})
+			}).then(data =>{
+				new Promise ((res, err) =>{
+					let lang_path = path.join(filename, 'fr') 
+					fs.exists(lang_path, exists => {
+						if(!exists) return res("")
+						fs.readdir(lang_path, (err, files) => {
+						res({"fr" : files, "en" : data})
+						})
+					})
+				}).then(data =>{
+					tab = data
+					yes(tab)
+				})
+			
+			})
+		})
+	})
+}
+
 exports.getFile = getFile;
 exports.getFile_by_page = getFile_by_page;
 exports.getFile_by_tag = getFile_by_tag;
