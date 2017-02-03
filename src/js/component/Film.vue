@@ -16,7 +16,7 @@
 			</div>
 		</div>
 		<div>
-			<p style="color: blue;" v-for="value in comments"> {{value}} </p>
+			<p style="color: blue;" v-for="value in comments"> {{value.login}} {{value.comment}} </p>
 			<textarea v-model="comment" placeholder="comment"></textarea>
 			 <button v-on:click="add">Add </button>
 			 <button v-on:click="voir">voir </button>
@@ -53,7 +53,7 @@ export default {
 		search: _.debounce(
 		function () {
 			var vm = this
-			console.log(this.imdb_code)
+			console.log("imdb ",this.imdb)
 			let token = window.localStorage.getItem("token")
 			vm.$http.get('search', {params : {imdb : this.imdb, code : this.code, id : this.id, token : token}} ).then((response) =>{
 				response.json().then((res)=>{
@@ -68,16 +68,21 @@ export default {
 					this.resume = res.resume
 					this.note = res.note+"/10"
 					this.info = this.released+" / "+this.time+" / "+this.genre
-					console.log("resr ",res.magnet);
+					console.log("resr ",res.film);
+					if (res && res.film && res.film.comment)
+					res.film.comment.forEach(elem=>{
+						this.comments.push({"comment" : elem.comment, "login" : elem.login})
+					})
 				});
 			}, (response) =>{
-		//		console.log(response)
 				this.tab = response
 				auth.logout();
 				app.redirect("/login")
 			});
 		}),
 		add : function () {
+			let token = window.localStorage.getItem("token")
+			this.$http.post("http://localhost:8080/comment",{comment : this.comment, token : token , code : this.code, id : this.id, imdb : this.imdb})
 			this.comments.push(this.comment);
 			this.comment = ""
 		},
@@ -91,12 +96,14 @@ export default {
 			})
 		}
 	},
-	beforeMount : function () {
+	mounted : function () {
+		this.comments = []
+		this.comment = "" 
 		this.imdb = this.$route.params.imdb
 		this.code = this.$route.params.code
 		this.id = this.$route.params.id
 		this.search();
-	}
+	},
 
 }
 

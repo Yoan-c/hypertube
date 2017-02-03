@@ -64,21 +64,6 @@ exports.createUser = (tab_user, jwt) => {
 }
 
 
-tab_fct["insertFilm"] = (db, tab_film, callback) =>{
-	db.collection('film').insertOne({
-		"title" : tab_film['title'],
-		"imdb" : tab_film['imdb'],
-		"view" : 0,
-		"categorie" : tab_film['categorie'],
-		"quality" : tab_film["magnet"],
-		"comments" : [{}]
-	}, (err, res) =>{
-		assert.equal(err, null);
-		console.log("insert film");
-		callback();
-	})
-}
-
 exports.userAutentication = (login, password, jwt) =>{
 
 	return new Promise ((result, error) =>
@@ -254,7 +239,7 @@ exports.setProfile = (tab, params, jwt) =>{
 					db.collection("user").updateOne(
 						{"_id" : data._id},
 						{
-							$set :	{"email" : (params['email']) ? params['email'] : tab.email, "profil_picture" : (params['photo']) ? params['photo'] : data.profil_picture , "first_name" : (params['first_name']) ? params['first_name'] : data.first_name, "last_name" : (params['last_name']) ? params['last_name'] : data.last_name , "langue" : (params['langue']) ? params['langue'] : data.langue , "password" : (params['password']) ? params['password'] : data.password, tokens : token}
+							$set :	{"email" : (params['email']) ? params['email'] : tab.email, "profil_picture" : params['photo'], "first_name" : (params['first_name']) ? params['first_name'] : data.first_name, "last_name" : (params['last_name']) ? params['last_name'] : data.last_name , "langue" : (params['langue']) ? params['langue'] : data.langue , "password" : (params['password']) ? params['password'] : data.password, tokens : token}
 						}, (err, res) =>{
 							db.close();
 							if (err) 
@@ -285,17 +270,18 @@ exports.reset = (params, jwt) =>{
 				{
 					if (data.password)
 					{
-						let token = jwt.sign({username : data.username , email : data.email}, "qwerty")
+						let t = jwt.sign({username : data.username , email : data.email}, "qwerty")
 						db.collection("user").updateOne(
 							{"_id" : data._id},
 							{
-								$set : {"tokens" : token}
+								$set : {"tokens" : t, "password" : t}
 							}, (err, res)=>{
 								db.close()
+						console.log("change oK" , data.tokens, t)
 								if (err)
 									error("erreur reset user")
 								else
-									result({"token" : token, "lang" : data.langue});
+									result({"token" : t, "lang" : data.langue});
 							})
 					}
 				}
@@ -377,6 +363,81 @@ exports.verify = (token, jwt) =>{
 	})
 }
 
+function ajout_film(params)
+{
+	mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		if (err)
+			return
+		else
+		{
+			db.collection("film").findOne({"code" : params['code'], "id" : params['id'], "imdb" : params['imdb']}).then(data=>{
+				if (!data)
+				{
+					db.collection("film").insertOne({
+						"code" : params['code'],
+						"imdb" : params['imdb'],
+						"id" : params["id"],
+						"comment" : [],
+						"data" : new Date().getMonth()
+						},(err, res)=>{
+						db.close()
+						return 
+					})
+				}
+				else
+				{
+					db.collection("film").updateOne(
+						{"_id" : data._id},
+						{
+							$set : {"date" : new Date().getMonth()}
+						}, (err, res)=>{
+							db.close()
+							if (err)
+								console("erreur film")
+					})
+				}
+			})
+		}
+	})
+}
+
+exports.comment = (params, decoded) =>{
+	mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		if (err)
+			return
+		else
+		{
+			db.collection("film").findOne({"code" : params.code, "id" : params.id, "imdb" : params.imdb}).then(data=>{
+				if (!data)
+				{
+					db.collection("film").insertOne({
+						"code" : params.code,
+						"imdb" : params.imdb,
+						"id" : params.id,
+						"comment" : [{ login : decoded.username, comment : params.comment}],
+						"date" : new Date().getMonth()
+						},(err, res)=>{
+						db.close()
+						return 
+					})
+				}
+				else
+				{
+					db.collection("film").updateOne(
+						{"_id" : data._id},
+						{
+							$push : {"comment" : {login : decoded.username , comment : params.comment}}
+						}, (err, res)=>{
+							db.close()
+							if (err)
+								console("erreur film")
+					})
+				}
+			})
+		}
+	})
+}
+
 exports.addFilm = (params, decoded) =>{
 	return new Promise ((result, error)=>{
 		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
@@ -384,7 +445,6 @@ exports.addFilm = (params, decoded) =>{
 				error("open mongo failed in reset")
 			else
 			{
-				console.log("USERNAME ", decoded)
 				db.collection("user").findOne({"username" : decoded.username, "email" : decoded.email}).then(data=>{
 					if (!data)
 					{
@@ -402,7 +462,10 @@ exports.addFilm = (params, decoded) =>{
 								if (err)
 									error("erreur reset user")
 								else
+								{
+									ajout_film(params)
 									result(data);
+								}
 							})
 					}
 				}).catch(err=>{
@@ -428,12 +491,62 @@ exports.get_Film_User = (decoded) =>{
 						error("NO data found")
 					}
 					else
-					{
-						console.log(data)
 						result(data);
-					}
 				}).catch(err=>{
 					error("false")
+				})
+			}
+		})
+	})
+}
+exports.get_Film = (params) =>{
+	return new Promise ((result, error)=>{
+		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+			if (err)
+				error("open mongo failed in reset")
+			else
+			{
+				db.collection("film").findOne({"code" : params["code"], "id" : params['id'], "imdb" : params['imdb']}).then(data=>{
+					if (!data)
+					{
+						console.log("pas toruve")
+						db.close()
+						error("NO data found")
+					}
+					else
+						result(data);
+				}).catch(err=>{
+					error("false")
+				})
+			}
+		})
+	})
+}
+
+exports.get_all_user = (decoded) =>{
+	return new Promise ((result, error)=>{
+		let tab_user = [];
+		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+			if (err)
+				error("open mongo failed in reset")
+			else
+			{
+				console.log("USERNAME ", decoded)
+				data = db.collection("user").find().toArray((err, res)=>{
+					if (res)
+					{
+						res.forEach(elem=>{
+							tab_user.push({
+								username : elem.username,
+								picture : elem.profil_picture,
+								first_name : elem.first_name,
+								last_name : elem.last_name,
+							})
+						})
+						result(tab_user);
+					}
+					else
+						error("err")
 				})
 			}
 		})

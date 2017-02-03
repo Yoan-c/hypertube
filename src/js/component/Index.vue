@@ -151,24 +151,19 @@ export default {
 			console.log("ici")
 			this.$router.push("/forget")
 		},
-		onSignIn : function (googleUser) {
-			var profile = googleUser.getBasicProfile();
-			console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-			console.log('Name: ' + profile.getName());
-			console.log('Image URL: ' + profile.getImageUrl());
-			console.log('Email: ' + profile.getEmail());
-		},
 		newUser : function(){
 			console.log("create new user" + this.isEmail(this.mail))
 			if (this.login && this.password && this.lastname && this.firstname && this.mail)
 			{
-				if (this.password === this.confirm_passwd)
+				if (this.password === this.confirm_passwd && this.password.length >= 4)
 				{
 					if (this.isEmail(this.mail))
 						auth.signup(this, "/search");
 					else
 						this.error = auth.i18n("error.email")
 				}
+				else if (this.password.length < 4)
+					this.error = auth.i18n("error.password_length")
 				else
 					this.error = auth.i18n("error.password")
 			}

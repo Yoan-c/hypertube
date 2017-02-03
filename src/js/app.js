@@ -8,6 +8,7 @@ import Error from './component/Error'
 import Reset from './component/Reset'
 import Oauth from './component/Oauth'
 import Film from './component/Film'
+import Users from './component/Users'
 import VueRouter from 'vue-router'
 import VueRessource from 'vue-resource'
 
@@ -58,6 +59,7 @@ const routes =
 		{ path: '/oauth/facebook/callback', component: Oauth },
 		{ path: '/oauth/github/callback', component: Oauth },
 		{ path: '/search', alias: '/', component: Search },
+		{ path: '/users', component: Users },
 		{ path: '/search/:imdb/:id/:code', component: Film,
 			beforeEnter : (to , from, next) =>{
 				let reg = /^tt\d{7}$/
@@ -99,7 +101,8 @@ import auth from "./function.js"
 new Vue ({
 	router,
 	data : {
-		log : "logout"
+		log : auth.i18n("authentication.logout"),
+		other_user : auth.i18n("search.users")
 	},
 	http: {
 		root: '/',

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		{{error}}
 		<table>
 			<tr>
 				<td>{{password}} : </td>
@@ -18,11 +19,13 @@
 
 <script>
 import auth from '../function.js'
+import app from '../app.js'
 export default {
   data () {
 	 return {
 		 password : "",
 		 pass : "",
+		 error : "",
 		 conf_password : "",
 		 conf_pass : "",
 		 req_conf_pass : "",
@@ -54,23 +57,18 @@ export default {
 					console.log("Erreur reset");
 				})
 			else
-				console.log("veuillez entrer un mot de passe et une confirmation")
+				this.error = auth.i18n("error.password")
 		},
 		verify : function (token){
 			this.$http.post("verify", {token : token}).then(data =>{
 			console.log("entre42", data.data.success)
 				if (data.data.success == "true")
-				{
-			console.log("entre dans veiry")
 					this.init();
-				}
 				else
-				{
-			console.log("entre dans veiry2")
 					this.$router.push("/")
-				}
 			}).catch(err=>{
-				console.log("erreur verify ", err)
+				auth.logout();
+				app.redirect("/login")
 			})
 		}
 	},

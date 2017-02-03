@@ -46,6 +46,12 @@
                         </li>
                     </ul>
 
+                    <ul v-show="check()" class="nav navbar-nav">
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="/users">{{other_user}}</router-link>
+                        </li>
+                    </ul>
+
                     <!-- Right Side Of Navbar -->
 
                     <ul v-if="check()" class="nav navbar-nav pull-xs-right">
@@ -58,7 +64,7 @@
                     </ul>
                     <ul v-else class="nav navbar-nav pull-xs-right">
                         <li class="nav-item">
-                            <router-link class="nav-link" to="/login">login</router-link>
+                            <router-link class="nav-link" to="/login">{{log}}</router-link>
                         </li>
                     </ul>
 
@@ -73,13 +79,9 @@
 
         </div>
 	</div>
-
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
-
 	<script src="/assets/js/app.js"></script>
-
-
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 </html>

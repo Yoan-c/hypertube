@@ -2,6 +2,7 @@
 	<div>
 		<table>
 			<tr>
+				{{error}}
 				<td>{{login}} : </td>
 				<td><input v-model="req_log" v-bind:placeholder="log"></td>
 			</tr>
@@ -18,10 +19,12 @@
 
 <script>
 import auth from '../function.js'
+import app from '../app.js'
 export default {
   data () {
 	 return {
 		 email : "",
+		 error : "",
 		 login : "",
 		 log : "",
 		 mail : "",
@@ -49,20 +52,21 @@ export default {
 		reset : function (){
 			console.log(this.req_mail)
 			if (!this.req_mail)
-				console.log("erreur il manque le mail")
+				this.error = auth.i18n("error.email")
 			else if (!this.req_log)
-				console.log("erreur il manque le login")
+				this.error = auth.i18n("error.log")
 			else if (!this.isEmail(this.req_mail))
-				console.log("mail non valide")
+				this.error = auth.i18n("error.email")
 			else
 				this.$http.post('reset',{login : this.req_log,  mail : this.req_mail} ).then(res=>{
 					console.log(res.data)
 					if (res.data.status == "ok")
 						this.$router.push("/")
 					else
-						console.log("User undefinded")
+						this.error = auth.i18n("error.account")
 				}).catch(err=>{
-					console.log("Erreur reset");
+					auth.logout();
+					app.redirect("/login")
 				})
 		}
 	},

@@ -1,11 +1,12 @@
 <template>
 	<div>
-	ok
+		{{req}}
 	</div>
 </template>
 
 <script>
 import auth from '../function.js'
+import app from '../app.js'
 export default {
   data () {
 	 return {
@@ -26,16 +27,14 @@ export default {
 			//console.log("data " , data.data.token)
 				auth.log(data.data.token, "/search")
 			}).catch(err=>{
+				auth.logout();
+				app.redirect("/login")
 				console.log("errr ", err)
 			})
-	},
-	/*logout : function ()
-		{
-			auth.logout();
-			this.$router.push("/")
-		}*/
+		},
 	},
 	mounted : function () {
+		this.req = auth.i18n("search.wait")
 		this.page(this.$route.query);
 	}
 }
