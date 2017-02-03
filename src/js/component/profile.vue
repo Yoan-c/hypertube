@@ -149,11 +149,6 @@ export default {
 					localStorage.setItem("lang", this.lang);
 					let token = window.localStorage.getItem("token")
 			 		this.$http.post('info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.photo2, langue : this.lang, password : this.password2, token : token}).then(res =>{
-						console.log("OK cest bon")
-						//auth.logout();
-				//		console.log("token " + localStorage.getItem("token"))
-				//		console.log("token " , res.data.token)
-			 		this.$http.post('http://localhost:8080/info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.image, langue : this.lang, password : this.password2, token : token}).then(res =>{
 						window.localStorage.setItem("token", res.data.token)
 						this.$router.go(0)
  					}).catch(err=>{
