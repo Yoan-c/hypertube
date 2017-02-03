@@ -39,7 +39,7 @@ export default {
 			this.mail = auth.i18n("authentication.email")
 			this.submit = auth.i18n("authentication.submit")
 			console.log("LA test i18naeriug aeuirg ")
-			
+
 		},
 		isEmail : function (myVar){
 		 // La 1ère étape consiste à définir l'expression régulière d'une adresse email
@@ -55,7 +55,7 @@ export default {
 			else if (!this.isEmail(this.req_mail))
 				console.log("mail non valide")
 			else
-				this.$http.post('http://localhost:8080/reset',{login : this.req_log,  mail : this.req_mail} ).then(res=>{
+				this.$http.post('reset',{login : this.req_log,  mail : this.req_mail} ).then(res=>{
 					console.log(res.data)
 					if (res.data.status == "ok")
 						this.$router.push("/")

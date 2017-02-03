@@ -22,7 +22,7 @@ export default {
 		else
 			state = query.state;
 
-		this.$http.post('http://localhost:8080/oauth/', {code : query.code, state: state}).then(data =>{
+		this.$http.post('oauth', {code : query.code, state: state}).then(data =>{
 			//console.log("data " , data.data.token)
 				auth.log(data.data.token, "/search")
 			}).catch(err=>{

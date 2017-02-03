@@ -3,9 +3,9 @@ let field = require("./field.js")
 const default_lang = "EN"
 import app from './app.js'
 export default {
-		
+
 	login(context, redirect){
-		context.$http.post('http://localhost:8080/login', {create : false, login : context.login, password : context.password}).then(data =>
+		context.$http.post('login', {create : false, login : context.login, password : context.password}).then(data =>
 		{
 			if (data.body.status)
 			{
@@ -39,7 +39,7 @@ export default {
 		},
 
 		signup(context, redirect){
-			context.$http.post("http://localhost:8080/login", {create : true, login : context.login, password : context.password, lastname : context.lastname, firstname : context.firstname, mail : context.mail, photo : context.photo}).then(data =>
+			context.$http.post("login", {create : true, login : context.login, password : context.password, lastname : context.lastname, firstname : context.firstname, mail : context.mail, photo : context.photo}).then(data =>
 					{
 						console.log(data)
 				if (data.body.result)

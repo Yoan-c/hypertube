@@ -42,9 +42,22 @@
 			<ul>
 				{{error}}
 				{{patiente}}
-				<li v-for="item in answer">
-					<router-link v-bind:to="'search/'+item.imdb_code+'/'+item.id+'/'+item.code">{{ item.title}} {{item.imdb_code}}<img v-bind:src=item.img /></router-link>  {{item.year}}
-				</li>
+
+
+          <div v-for="(item, key) in answer" class="card">
+
+                <img class="card-img-top" :src="item.img" alt="Card image cap">
+                <div class="card-block">
+                  <h4 class="card-title">{{ item.title}}</h4>
+                  <p class="card-text">{{item.imdb_code}} - {{item.year}}</p>
+                </div>
+                <div class="card-footer">
+                  <small class="text-muted">Last updated 3 mins ago</small>
+                  <router-link v-bind:to="'search/'+item.imdb_code+'/'+item.id+'/'+item.code">Select</router-link>
+                </div>
+
+          </div>
+
 			</ul>
 		</div>
 	</form>
@@ -138,7 +151,7 @@ export default {
 			this.page()
 		}
 		else
-			vm.$http.get('http://localhost:8080/search',{params : {name : this.req, token : token}} ).then((res) =>{
+			vm.$http.get('search',{params : {name : this.req, token : token}} ).then((res) =>{
 				console.log(res)
 				this.answer = res.body.films
 				this.film_vue = res.body.film_vue
@@ -172,7 +185,7 @@ export default {
 	function () {
 		this.init()
 		let token = window.localStorage.getItem("token")
-		this.$http.get('http://localhost:8080/search', {params : {token : token, page : this.current_page}}).then((response) =>{
+		this.$http.get('search', {params : {token : token, page : this.current_page}}).then((response) =>{
 			response.json().then((res)=>{
 				this.answer = this.answer.concat(res.films)
 				this.film_vue = res.film_vue
@@ -218,8 +231,8 @@ export default {
 			else if (this.maxAnnee && this.minAnnee && Number(this.maxAnnee) < Number(this.minAnnee))
 				console.log("erreur dans les annee")
 			else
-				this.$http.get("http://localhost:8080/search", {params : {nom : this.nomFilm, genre : this.genre, minNote : this.minNote , maxNote : this.maxNote, minAnnee : this.minAnnee, maxAnnee : this.maxAnnee, sort : this.sort, order : this.order, page : this.current , av: 1}}).then(res =>{
-				
+				this.$http.get("search", {params : {nom : this.nomFilm, genre : this.genre, minNote : this.minNote , maxNote : this.maxNote, minAnnee : this.minAnnee, maxAnnee : this.maxAnnee, sort : this.sort, order : this.order, page : this.current , av: 1}}).then(res =>{
+
 					if (res.body.ret && res.body.ret == "FIN")
 					{
 						this.patiente = ""
@@ -262,7 +275,7 @@ export default {
 	{
 		this.error = ""
 		this.current = 0;
-		this.$http.get("http://localhost:8080/search", {params : {nom : this.res_nomFilm, genre : this.res_genre, minNote : this.res_minNote , maxNote : this.res_maxNote, minAnnee : this.res_minAnnee, maxAnnee : this.res_maxAnnee, sort : this.res_sort, order : this.res_order, page : this.res_current , av: 1}}).then(data =>{
+		this.$http.get("search", {params : {nom : this.res_nomFilm, genre : this.res_genre, minNote : this.res_minNote , maxNote : this.res_maxNote, minAnnee : this.res_minAnnee, maxAnnee : this.res_maxAnnee, sort : this.res_sort, order : this.res_order, page : this.res_current , av: 1}}).then(data =>{
 			console.log("la avance" , data, this.res_current)
 		this.answer_avance = this.answer.concat(data.body)
 			if (data.body.size < 1)

@@ -94,9 +94,9 @@ export default {
 	function () {
 		var vm = this
 		let token = window.localStorage.getItem("token")
-		
+
 		this.init();
-		vm.$http.post('http://localhost:8080/info_profile',{modif : false, token : token} ).then((response) =>{
+		vm.$http.post('info_profile',{modif : false, token : token} ).then((response) =>{
 			console.log("retour positif" , response)
 			this.answer = response.data;
 			let lang = response.data.langue;
@@ -123,7 +123,7 @@ export default {
 						this.lang = "EN"
 					localStorage.setItem("lang", this.lang);
 					let token = window.localStorage.getItem("token")
-			 		this.$http.post('http://localhost:8080/info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.photo2, langue : this.lang, password : this.password2, token : token}).then(res =>{
+			 		this.$http.post('info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.photo2, langue : this.lang, password : this.password2, token : token}).then(res =>{
 						console.log("OK cest bon")
 						//auth.logout();
 				//		console.log("token " + localStorage.getItem("token"))

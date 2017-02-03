@@ -55,7 +55,7 @@ export default {
 			var vm = this
 			console.log(this.imdb_code)
 			let token = window.localStorage.getItem("token")
-			vm.$http.get('http://localhost:8080/search', {params : {imdb : this.imdb, code : this.code, id : this.id, token : token}} ).then((response) =>{
+			vm.$http.get('search', {params : {imdb : this.imdb, code : this.code, id : this.id, token : token}} ).then((response) =>{
 				response.json().then((res)=>{
 					this.tab = res
 					this.title = res.title
@@ -84,7 +84,7 @@ export default {
 		voir : function (){
 			console.log(this.tab.magnet)
 			let token = window.localStorage.getItem("token")
-			this.$http.post("http://localhost:8080/see", {magnet : this.tab.magnet , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
+			this.$http.post("see", {magnet : this.tab.magnet , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
 				console.log("data seen", data)
 			}).catch(err=>{
 				console.log("erreur seen", err)

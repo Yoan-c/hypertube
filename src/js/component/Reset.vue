@@ -46,7 +46,7 @@ export default {
 			if (this.req_pass && this.req_conf_pass && this.req_pass !== this.req_conf_pass)
 					console.log("Entrer des mots de passes identique")
 			else if (this.req_pass && this.req_conf_pass && this.req_pass == this.req_conf_pass)
-				this.$http.post('http://localhost:8080/resetMdp',{mdp : this.req_pass , token : token} ).then(res=>{
+				this.$http.post('resetMdp',{mdp : this.req_pass , token : token} ).then(res=>{
 					if (res.data.token)
 						localStorage.setItem("token", res.data.token)
 						this.$router.push("/")
@@ -57,7 +57,7 @@ export default {
 				console.log("veuillez entrer un mot de passe et une confirmation")
 		},
 		verify : function (token){
-			this.$http.post("http://localhost:8080/verify", {token : token}).then(data =>{
+			this.$http.post("verify", {token : token}).then(data =>{
 			console.log("entre42", data.data.success)
 				if (data.data.success == "true")
 				{

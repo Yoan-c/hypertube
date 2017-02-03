@@ -1,32 +1,114 @@
 <template>
 <div id="content">
-	<div v-if="show">
-		{{error}}
-		<input  v-model="login" v-bind:placeholder="log" />
-		<input  v-model="password" v-bind:placeholder="passwd" />
-		<button  v-on:click.prevent="sign()">{{sign_in}}</button>
-		<a href="#" id="lien" v-on:click.prevent="shows(false)">{{create}}</a>
-	</div>
-	<div v-else>
-		{{error}}
-		<input v-model="login" v-bind:placeholder="log"/>
 
-		<input type="email" v-model="mail" v-bind:placeholder="email" />
-		<input id="firstname" v-model="firstname" v-bind:placeholder="firstname2" />
-		<input id="lastname" v-model="lastname" v-bind:placeholder="lastname2" />
-		<input id="passwd2" v-model="password" v-bind:placeholder="passwd" />
-		<input id="confirm_passwd" v-model="confirm_passwd" v-bind:placeholder="confirm_pass" />
+  <div v-if="error">
+    <div class="alert alert-danger" role="alert">
+      {{error}}
+    </div>
+  </div>
 
-		<button id="create" v-on:click="newUser()" >{{create}}</button>
-		<a href="#" id="lien2" v-on:click.prevent="shows(true)" >{{sign_in}}</a>
-		
-		{{ msg }}
-	</div>
-	<button  v-on:click="forget()" >{{forget_pass}}</button>
-		<a href="https://api.intra.42.fr/oauth/authorize?client_id=8a8c56a0edca0a04a3e1b89b70ba2a4b79f03f2c07784856a8d21d89547d9039&redirect_uri=http%3A%2F%2Flocalhost%3A3002%2Foauth%2F42%2Fcallback&scope=public&response_type=code" >42</a>
-		<a href="https://accounts.google.com/o/oauth2/v2/auth?scope=email%20profile&state=google&redirect_uri=http://localhost:3002/oauth/google/callback&response_type=code&client_id=161312720047-a6o6f6iss7u5vonsq8og5g31c0hqsh4n.apps.googleusercontent.com" >google</a>
-		<a href="https://slack.com/oauth/authorize?scope=identity.basic,identity.email&client_id=3329266210.130370627137&state=slack" >slack</a>
-		<a href="https://github.com/login/oauth/authorize?client_id=75c7e71cbfca78dbf304&redirect_uri=http://localhost:3002/oauth/github/callback&state=github" >github</a>
+  <div v-if="show" class="col-xl-6 offset-xl-3">
+    <div class="card">
+
+      <div class="card-block">
+
+        <h2 class="card-title">Login In</h2>
+
+          <div class="form-group">
+            <label for="username"> Username</label>
+            <input class="form-control" type="text" v-model="login"
+                   :placeholder="log" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input class="form-control" type="password" v-model="password"
+                   :placeholder="passwd" required>
+          </div>
+
+          <button class="btn btn-success" @click="sign()"> {{sign_in}}</button>
+          <a href="#" class="btn btn-link" @click="forget()">{{forget_pass}}</a>
+
+      </div>
+
+      <div class="card-footer">
+        <a href="#" class="btn btn-link" @click.prevent="shows(false)">{{create}}</a>
+      </div>
+    </div>
+  </div>
+
+  <div v-else class="col-xl-8 offset-xl-2">
+
+    <div class="card">
+
+      <div class="card-block">
+
+        <h2 class="card-title">Sign In</h2>
+
+          <div class="form-group row">
+
+            <div class="col-md-12">
+              <label>Name :</label>
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="text" v-model="firstname"
+                     :placeholder="firstname2" required autofocus>
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="text" v-model="lastname"
+                     :placeholder="lastname2" required>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="username">Username :</label>
+            <input class="form-control" type="text" v-model="login"
+                   :placeholder="log" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-mail :</label>
+            <input class="form-control" type="email" v-model="mail"
+                   :placeholder="email" required>
+          </div>
+
+          <div class="form-group row">
+
+            <div class="col-md-12">
+              <label for="password">Password :</label>
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="password" v-model="password"
+                     :placeholder="passwd" required>
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="password" v-model="confirm_passwd"
+                     :placeholder="confirm_pass" required>
+            </div>
+
+          </div>
+
+
+          <button class="btn btn-primary" @click="newUser()" >{{create}}</button>
+
+      </div>
+
+      <div class="card-footer text-muted">
+        <p> Already signed up? <a href="#" @click.prevent="shows(true)" >{{sign_in}}</a>
+      </div>
+
+    </div>
+  </div>
+
+  <a href="https://api.intra.42.fr/oauth/authorize?client_id=8a8c56a0edca0a04a3e1b89b70ba2a4b79f03f2c07784856a8d21d89547d9039&redirect_uri=http%3A%2F%2Flocalhost%3A3002%2Foauth%2F42%2Fcallback&scope=public&response_type=code" >42</a>
+  <a href="https://accounts.google.com/o/oauth2/v2/auth?scope=email%20profile&state=google&redirect_uri=http://localhost:3002/oauth/google/callback&response_type=code&client_id=161312720047-a6o6f6iss7u5vonsq8og5g31c0hqsh4n.apps.googleusercontent.com" >google</a>
+  <a href="https://slack.com/oauth/authorize?scope=identity.basic,identity.email&client_id=3329266210.130370627137&state=slack" >slack</a>
+  <a href="https://github.com/login/oauth/authorize?client_id=75c7e71cbfca78dbf304&redirect_uri=http://localhost:3002/oauth/github/callback&state=github" >github</a>
 </div>
 </template>
 
@@ -35,7 +117,6 @@ import auth from '../function.js'
 export default {
 	data () {
 		return {
-			msg: 'index!',
 			login : "",
 			log : "",
 			password : "",

@@ -12,14 +12,26 @@ import VueRouter from 'vue-router'
 import VueRessource from 'vue-resource'
 
 let field = require("./field.js")
-window.$ = require('jquery')
+
+
+/*
+ * Bootstrap and Dependence
+ */
+window.$ = window.jQuery = require('jquery')
+window.Tether = require('tether')
+require('bootstrap')
+
 Vue.use(VueRouter)
 Vue.use(VueRessource)
 Vue.http.options.emulateJSON = true;
 
 const default_lang = "EN"
 const tab_lang = ["FR", "EN"]
-var path_auto = ["/login", "/oauth/42/callback", "/oauth/google/callback", "/oauth/slack/callback", "/oauth/facebook/callback", "/oauth/github/callback", "/forget", "/reset"]
+let path_auto = ["/login", "/oauth/42/callback", "/oauth/google/callback", "/oauth/slack/callback", "/oauth/facebook/callback", "/oauth/github/callback", "/forget", "/reset"]
+
+const api_url = 'http://e3r10p6.42.fr:8080'
+
+Vue.http.options.root = api_url
 
 const routes =
 	[
@@ -27,7 +39,7 @@ const routes =
 		{ path: '/profile', component: Profile },
 		{ path: '/error', component: Error },
 		{ path: '/forget', component: Forget },
-		{ path: '/reset', component: Reset , 
+		{ path: '/reset', component: Reset ,
 			beforeEnter : (to, from, next) =>{
 				if (to.query.lang)
 					localStorage.setItem("lang", to.query.lang)
@@ -76,7 +88,7 @@ router.beforeEach((to, from, next)=>{
 
 	if (token && to.path == "/login")
 		return next("/")
-	
+
 	if (token || path_auto.indexOf(to.path) >= 0 || to.path == "/oauth/google/callback")
 	{
 		return next()
@@ -102,7 +114,9 @@ new Vue ({
 		check : function() {
 			let token = localStorage.getItem("token");
 			this.log = auth.i18n("authentication.logout")
-			return (token) ? true : false;
+
+
+			return token ? true : false;
 		}
 	},
 
@@ -146,7 +160,7 @@ export default {
 		else
 			router.push("/login")
 	},
-	
+
 	signup(context, redirect){
 		context.$http.post("http://localhost:8080/login", {create : true, login : context.login, password : context.password, lastname : context.lastname, firstname : context.firstname, mail : context.mail, photo : context.photo}).then(data =>
 		{
@@ -170,7 +184,7 @@ export default {
 		console.log("TEST")
 		router.push("/login")
 	},
-	
+
 	getAuthHeader(){
 		return {
 			'Authorization' : 'Bearer ' + localStorage.getItem('token')
