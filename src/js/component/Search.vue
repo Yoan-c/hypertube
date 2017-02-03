@@ -214,16 +214,16 @@ export default {
 				this.answer = []
 			this.avance = true;
 			if (this.maxNote && this.minNote && Number(this.maxNote) < Number(this.minNote))
-				console.log("erreur dans les notes")
+				this.error = auth.i18n("error.note")
 			else if (this.maxAnnee && this.minAnnee && Number(this.maxAnnee) < Number(this.minAnnee))
-				console.log("erreur dans les annee")
+				this.error = auth.i18n("error.year")
 			else
 				this.$http.get("http://localhost:8080/search", {params : {nom : this.nomFilm, genre : this.genre, minNote : this.minNote , maxNote : this.maxNote, minAnnee : this.minAnnee, maxAnnee : this.maxAnnee, sort : this.sort, order : this.order, page : this.current , av: 1}}).then(res =>{
 				
 					if (res.body.ret && res.body.ret == "FIN")
 					{
 						this.patiente = ""
-						this.error = "Fin de la recherche"
+						this.error = auth.i18n("search.end") 
 					}
 					else
 					{
@@ -231,7 +231,7 @@ export default {
 						this.answer_avance = this.answer.concat(res.body.films)
 						if (res.body.size < 1)
 						{
-							this.patiente = "patientez"
+							this.patiente = auth.i18n("search.wait")
 							this.current++;
 							this.advanced_search()
 						}
@@ -248,13 +248,12 @@ export default {
 							})
 							data.vue = val
 						})
-						console.log("vue ", this.answer)
-					//this.answer = this.answer.concat(data)
 					}
 				}).catch(err=>{
 					this.current = 0;
 					this.current_page = 0;
-					console.log("cest nul " , err)
+					auth.logout();
+					app.redirect("/login")
 				})
 		}
 	},
@@ -262,22 +261,29 @@ export default {
 	{
 		this.error = ""
 		this.current = 0;
-		this.$http.get("http://localhost:8080/search", {params : {nom : this.res_nomFilm, genre : this.res_genre, minNote : this.res_minNote , maxNote : this.res_maxNote, minAnnee : this.res_minAnnee, maxAnnee : this.res_maxAnnee, sort : this.res_sort, order : this.res_order, page : this.res_current , av: 1}}).then(data =>{
-			console.log("la avance" , data, this.res_current)
-		this.answer_avance = this.answer.concat(data.body)
-			if (data.body.size < 1)
+		this.$http.get("http://localhost:8080/search", {params : {nom : this.res_nomFilm, genre : this.res_genre, minNote : this.res_minNote , maxNote : this.res_maxNote, minAnnee : this.res_minAnnee, maxAnnee : this.res_maxAnnee, sort : this.res_sort, order : this.res_order, page : this.res_current , av: 1}}).then(res =>{
+			console.log("la avance" , res, this.res_current)
+		this.answer_avance = this.answer.concat(res.body.films)
+			if (res.body.size < 1)
 			{
-				this.patiente = "patientez"
+				this.patiente = auth.i18n("search.wait")
 				this.res_current++;
 				this.advanced_search()
 			}
-			else if (data.body.status == false)
+			else if (res.body.status == false)
 				console.log("FINI")
 			else
 				this.answer = this.answer_avance
-		//this.answer = this.answer.concat(data)
+				this.film_vue = res.body.film_vue
+				this.answer.forEach(data=>{
+					let val = res.body.film_vue.some(elem=>{
+						return (elem.id == data.id && elem.imdb == data.imdb_code && elem.code == data.code)
+					})
+					data.vue = val
+				})
 		}).catch(err=>{
-			console.log("cest nul")
+			auth.logout();
+			app.redirect("/login")
 		})
 	},
 	modif_profile : function ()
@@ -291,16 +297,13 @@ export default {
 			if ($(document).height() - $(window).height() == $(window).scrollTop()) {
 				this.current_page++
 				this.res_current++
-				console.log(this.advance)
 				if (!this.avance)
 				{
-					console.log("passe ici page normal")
 					this.res_current = 0
 					this.page();
 				}
 				else
 				{
-					console.log("passe ici page avance", this.res_current)
 					this.current_page = 0;
 					this._advanced()
 				}

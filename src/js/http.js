@@ -84,10 +84,8 @@ let server = http.createServer(function (req, res){
 			token2 = (params["token"])? params["token"] : querystring.parse(url.parse(req.url).query).token;
 			if (token && token2 && token != token2)
 				token = token2
-			console.log("token ", token)
 			jwt.verify(token, 'qwerty', function(err, decoded) {
 				params = querystring.parse(post)
-				console.log("test ", decoded)
 				if (err)
 				{
 					console.log("erreur http checkTorrent")
@@ -97,23 +95,39 @@ let server = http.createServer(function (req, res){
 					res.end()
 				}
 				else
-					if (query == "/search" )
+					if (query == "/users")
+					{
+						data.get_all_user(decoded).then(data =>{
+							res.write(JSON.stringify({"ret" : data}));
+							res.end();
+						}).catch(err=>{
+							res.write(JSON.stringify({"ret" : err}));
+							res.end();
+						})
+					}
+					else if (query == "/search" )
 					{
 						var params = querystring.parse(url.parse(req.url).query);
 						if (params["imdb"] && params["id"] && params["code"])
 						{
-							console.log("IMBD ",data.magnet)
-							search.getFile(params["id"], params["code"], params["imdb"]).then((data) => {
-								console.log("MAGNEEEEEEEEEEETTTTT ",data.magnet)
-								res.write(JSON.stringify(data));
-								res.end();
+							search.getFile(params["id"], params["code"], params["imdb"]).then((result) => {
+								data.get_Film(params).then(resultat=>{
+									console.log("RESULTAT ", resultat)
+									result.film = resultat
+									res.write(JSON.stringify(result));
+									res.end();
+								}).catch(err=>{
+									console.log("PAS TROUVEEEE ")
+									result.film = "" 
+									res.write(JSON.stringify(result));
+									res.end();
+								})
 							})
 						}
 						else if (params["name"])
 						{
 							search.getFile_by_tag(params["name"]).then((resultat) => {
 								data.get_Film_User(decoded).then((result)=>{
-									console.log("retour")
 									res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
 									res.end();
 								}).catch(err=>{
@@ -129,7 +143,6 @@ let server = http.createServer(function (req, res){
 							console.log(params)
 							search.advance(params).then(resultat =>{
 								data.get_Film_User(decoded).then((result)=>{
-									console.log("retour")
 									if (resultat == "FIN")
 										res.write(JSON.stringify({"ret" : resultat}));
 									else 
@@ -148,12 +161,10 @@ let server = http.createServer(function (req, res){
 						}
 						else
 						{
-							console.log("ICI SEARCH", params["page"])
 							if (!params["page"])
 								params["page"] = '1'
 							search.getFile_by_page(Number(params["page"])).then((resultat) => {
 								data.get_Film_User(decoded).then((result)=>{
-									console.log("retour")
 									res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
 									res.end();
 								}).catch(err=>{
@@ -202,13 +213,23 @@ let server = http.createServer(function (req, res){
 							})
 						}
 					}
+					else if (query == "/comment")
+					{
+						if (params.comment)
+						{
+							console.log("params ", params)
+							data.comment(params, decoded)
+							res.end()
+						}
+						else
+							res.end()
+					}
 					else if (query == "/see")
 					{
 						if (params && params["magnet[]"], params['code'] && params['imdb'] && params['id'])
 						{
 
 							//console.log(params["magnet[]"][0])
-							console.log(params, decoded)
 							/*let magnet = params["magnet[]"][0]
 							let client = new StreamClient()
 							client.add(magnet)
@@ -219,7 +240,6 @@ let server = http.createServer(function (req, res){
 								console.log("error ", data)
 							})*/
 							data.addFilm(params, decoded).then(data=>{
-							console.log("data FILm ", data)
 							}).catch(err=>{
 								console.log("err FILM ", err)
 							})
@@ -239,7 +259,6 @@ let server = http.createServer(function (req, res){
 		{
 			if (query == "/login")
 			{
-				console.log(params)
 				if (params.login && params.password)
 				{
 					let password = whirlpool(params.password)
@@ -247,7 +266,6 @@ let server = http.createServer(function (req, res){
 					{
 						data.userAutentication(params.login, password, jwt).then((data)=>{
 							//let token = jwt.sign({username : data}, "qwerty");
-							console.log(data)
 							let response = {
 								token: data.token,
 								lang: data.lang,
@@ -256,7 +274,6 @@ let server = http.createServer(function (req, res){
 							res.write(JSON.stringify(response))
 							res.end()
 						}).catch((err) =>{
-							console.log("err")
 							res.write(JSON.stringify({status : false, "err" : err}))
 							res.end()
 						})
@@ -270,7 +287,6 @@ let server = http.createServer(function (req, res){
 								result : true,
 								status : true
 							}
-							console.log("compte bien cree ")
 							res.write(JSON.stringify(response))
 							res.end()
 						}).catch(err=>{
@@ -291,6 +307,7 @@ let server = http.createServer(function (req, res){
 				if (params['login'] && params['mail'])
 				{
 					data.reset(params, jwt).then(data=>{
+						console.log(data)
 						mail.sendMail(params, data).then(response=>{
 							console.log("email send")
 							res.write(JSON.stringify({status : "ok"}))

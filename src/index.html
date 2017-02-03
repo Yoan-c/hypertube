@@ -8,8 +8,7 @@
     <meta name="author" content="">
 	<meta name="google-signin-client_id" content="161312720047-a6o6f6iss7u5vonsq8og5g31c0hqsh4n.apps.googleusercontent.com">
 	<link rel="icon" href="favicon.ico">
-
-    <title>Webpack Config</title>
+	<title>Webpack Config</title>
 
     <!-- Custom styles for this template -->
 
@@ -22,6 +21,7 @@
 <body>
 	<div id="page">
 		<router-link to="/search" v-show="check()">go</router-link>
+		<router-link to="/users" v-show="check()">{{other_user}}</router-link>
 		<button @click="logout()" v-show="check()">{{log}}</button>
 		<router-view></router-view>
 	</div>

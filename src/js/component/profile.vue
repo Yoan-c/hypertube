@@ -1,5 +1,6 @@
 <template>
 	<div>
+		{{error}}
 		<table>
 			<tr>
 				<td>{{login}} : </td>
@@ -18,10 +19,6 @@
 				<td><input v-model="email2" v-bind:placeholder="answer.email" ></td>
 			</tr>
 			<tr>
-				<td>{{photo}} : </td>
-				<td><input v-model="photo2" v-bind:placeholder="answer.picture" ></td>
-			</tr>
-			<tr>
 				<td>{{langue}} : </td>
 				<td><select v-model="lang"  >
 						<option v-for="option in options" v-bind:value="option.value">
@@ -38,10 +35,17 @@
 				<td>{{conf_password}} : </td>
 				<td><input v-model="confirm_password"  type="password"></td>
 			</tr>
-			<tr>
-				<button @click="modifier()">{{modify}}</button>
-			</tr>
 		</table>
+			{{photo}} :
+			<div v-if="!image">
+				<h2>Select an image</h2>
+				<input type="file" @change="onFileChange">
+			</div>
+			<div v-else>
+				<img :src="image" />
+				<button @click="removeImage">Remove image</button>
+			</div>
+			<button @click="modifier()">{{modify}}</button>
 	</div>
 </template>
 
@@ -55,11 +59,13 @@ export default {
 		 profile : "Profile",
 		 log : "log out",
 		 login : "",
+		 image : "",
 		 lang : "",
 		 last_name : "",
 		 lastName : "",
 		 first_name : "",
 		 firstName : "",
+		 error : "",
 		 email : "",
 		 email2 : "",
 		 photo : "",
@@ -79,7 +85,26 @@ export default {
 	 }
   },
   methods : {
-	  init : function (){
+	onFileChange(e) {
+		var files = e.target.files || e.dataTransfer.files;
+		if (!files.length)
+			return;
+		this.createImage(files[0]);
+	},
+	createImage(file) {
+		var image = new Image();
+		var reader = new FileReader();
+		var vm = this;
+		reader.onload = (e) => {
+			vm.image = e.target.result;
+			console.log(vm.image)
+		};
+		reader.readAsDataURL(file);
+	},
+	removeImage: function (e) {
+		this.image = '';
+	},
+	init : function (){
 			this.login = auth.i18n("authentication.login")
 			this.first_name = auth.i18n("authentication.first_name")
 			this.last_name = auth.i18n("authentication.last_name")
@@ -99,10 +124,11 @@ export default {
 		vm.$http.post('http://localhost:8080/info_profile',{modif : false, token : token} ).then((response) =>{
 			console.log("retour positif" , response)
 			this.answer = response.data;
+			this.image = this.answer.picture
 			let lang = response.data.langue;
 			localStorage.setItem("lang", lang);
 		}).catch(error =>{
-			console.log("retour " , error)
+			auth.logout();
 			app.redirect("/error")
 		});
 	}),
@@ -114,7 +140,7 @@ export default {
 	modifier: function()
 		{
 			if ((this.password2 && !this.confirm_passwd || !this.password2 && this.confirm_passwd) || this.password2 && this.confirm_passwd && this.password2 != this.confirm_passwd)
-				console.log("password et confirm_passwd sont different")
+				this.error = auth.i18n("error.password")
 			else
 			{
 				if (!this.email2 || (this.email2 && this.isEmail(this.email2)))
@@ -123,21 +149,16 @@ export default {
 						this.lang = "EN"
 					localStorage.setItem("lang", this.lang);
 					let token = window.localStorage.getItem("token")
-			 		this.$http.post('http://localhost:8080/info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.photo2, langue : this.lang, password : this.password2, token : token}).then(res =>{
-						console.log("OK cest bon")
-						//auth.logout();
-				//		console.log("token " + localStorage.getItem("token"))
-				//		console.log("token " , res.data.token)
+			 		this.$http.post('http://localhost:8080/info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.image, langue : this.lang, password : this.password2, token : token}).then(res =>{
 						window.localStorage.setItem("token", res.data.token)
 						this.$router.go(0)
  					}).catch(err=>{
-						console.log("erreur modif ",  err)
 						auth.logout();
 						app.redirect("/login")
  					})
 				}
 				else
-					console.log("erreur dans la modification de mail")
+					this.error = auth.i18n("error.email")
 			}
 		}
 	},

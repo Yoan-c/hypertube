@@ -1,21 +1,18 @@
 let nodemailer = require('nodemailer');
 let transporter = nodemailer.createTransport({
-	localhost : "localhost",
-	port : 25,
+	service : "hotmail",
+	auth : {
+		user : "Hypertube972@hotmail.fr",
+		pass : "Hypertube"
+	}
 });
 
-transporter.verify(function(err, succ){
-	if (err)
-	console.log("error ", err)
-	else
-	console.log("OKOKOKOKOK ")
-})
 exports.sendMail = (data, tab) =>
 {
 	return new Promise ((result, err) =>
 	{
 		let mailOptions = {
-			from: "ycoutenay@student.42.fr",
+			from: "hypertube972@hotmail.com",
 			to: data['mail'],
 			subject: "mail mdp",
 			html: "Forget password ? <a href='http://localhost:3002/reset?lang="+tab.lang+"&token="+tab.token+"'>click here</a>"
