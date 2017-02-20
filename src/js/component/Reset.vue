@@ -4,11 +4,11 @@
 		<table>
 			<tr>
 				<td>{{password}} : </td>
-				<td><input v-model="req_pass" v-bind:placeholder="pass"></td>
+				<td><input type="password" v-model="req_pass" v-bind:placeholder="pass"></td>
 			</tr>
 			<tr>
 				<td>{{conf_password}} : </td>
-				<td><input v-model="req_conf_pass" v-bind:placeholder="conf_pass"></td>
+				<td><input type="password" v-model="req_conf_pass" v-bind:placeholder="conf_pass"></td>
 			</tr>
 			<tr>
 				<td> <button v-on:click="update()">{{modify}}</button></td>
@@ -36,7 +36,6 @@ export default {
   methods : {
 	init : function ()
 		{
-			console.log("init")
 			this.password = auth.i18n("authentication.password")
 			this.pass = auth.i18n("authentication.password")
 			this.conf_password = auth.i18n("authentication.conf_password")
@@ -44,24 +43,29 @@ export default {
 			this.modify = auth.i18n("authentication.modify")
 		},
 		update : function (){
-			console.log("ici", this.req_pass)
 			let token = this.$route.query.token
 			if (this.req_pass && this.req_conf_pass && this.req_pass !== this.req_conf_pass)
-					console.log("Entrer des mots de passes identique")
+					this.error = auth.i18n("error.password")
 			else if (this.req_pass && this.req_conf_pass && this.req_pass == this.req_conf_pass)
-				this.$http.post('resetMdp',{mdp : this.req_pass , token : token} ).then(res=>{
-					if (res.data.token)
-						localStorage.setItem("token", res.data.token)
-						this.$router.push("/")
-				}).catch(err=>{
-					console.log("Erreur reset");
-				})
+			{
+				if (this.req_pass.length >= 4)
+				{
+					this.$http.post('resetMdp',{mdp : this.req_pass , token : token} ).then(res=>{
+						if (res.data.token)
+							localStorage.setItem("token", res.data.token)
+							this.$router.push("/")
+					}).catch(err=>{
+						console.log("Erreur reset");
+					})
+				}
+				else
+					this.error = auth.i18n("error.password.length")
+			}
 			else
 				this.error = auth.i18n("error.password")
 		},
 		verify : function (token){
 			this.$http.post("verify", {token : token}).then(data =>{
-			console.log("entre42", data.data.success)
 				if (data.data.success == "true")
 					this.init();
 				else

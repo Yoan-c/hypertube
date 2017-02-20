@@ -148,11 +148,9 @@ export default {
 			auth.login(this, "/search")
 		},
 		forget : function(){
-			console.log("ici")
 			this.$router.push("/forget")
 		},
 		newUser : function(){
-			console.log("create new user" + this.isEmail(this.mail))
 			if (this.login && this.password && this.lastname && this.firstname && this.mail)
 			{
 				if (this.password === this.confirm_passwd && this.password.length >= 4)

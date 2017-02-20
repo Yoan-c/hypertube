@@ -2,7 +2,11 @@
 	<div>
 		<table>
 			<tr>
-				{{error}}
+			<div v-if="error">
+				<div class="alert alert-danger" role="alert">
+					{{error}}
+				</div>
+			</div>
 				<td>{{login}} : </td>
 				<td><input v-model="req_log" v-bind:placeholder="log"></td>
 			</tr>
@@ -35,13 +39,11 @@ export default {
   },
   methods : {
 	  init : function  () {
-			console.log("LA test i18n")
 			this.login = auth.i18n("authentication.login")
 			this.log = auth.i18n("authentication.login")
 			this.email = auth.i18n("authentication.email")
 			this.mail = auth.i18n("authentication.email")
 			this.submit = auth.i18n("authentication.submit")
-			console.log("LA test i18naeriug aeuirg ")
 
 		},
 		isEmail : function (myVar){
@@ -50,7 +52,6 @@ export default {
 			return regEmail.test(myVar);
 		},
 		reset : function (){
-			console.log(this.req_mail)
 			if (!this.req_mail)
 				this.error = auth.i18n("error.email")
 			else if (!this.req_log)
@@ -59,9 +60,10 @@ export default {
 				this.error = auth.i18n("error.email")
 			else
 				this.$http.post('reset',{login : this.req_log,  mail : this.req_mail} ).then(res=>{
-					console.log(res.data)
 					if (res.data.status == "ok")
 						this.$router.push("/")
+					else if (res.data.status == "email")
+						this.error = "An error has occured with E-mail service"
 					else
 						this.error = auth.i18n("error.account")
 				}).catch(err=>{

@@ -96,7 +96,6 @@ export default {
 		var vm = this;
 		reader.onload = (e) => {
 			vm.image = e.target.result;
-			console.log(vm.image)
 		};
 		reader.readAsDataURL(file);
 	},
@@ -121,7 +120,6 @@ export default {
 
 		this.init();
 		vm.$http.post('info_profile',{modif : false, token : token} ).then((response) =>{
-			console.log("retour positif" , response)
 			this.answer = response.data;
 			this.image = this.answer.picture
 			let lang = response.data.langue;

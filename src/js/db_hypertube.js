@@ -2,12 +2,12 @@ let mongo = require("mongodb").MongoClient;
 let assert = require("assert")
 let request = require("request");
 let tab_fct = []
+let fs = require('fs');
 
 exports.createUser = (tab_user, jwt) => {
 
 	return new Promise ((result, error) =>
 	{
-		console.log(tab_user)
 		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
 			if (err) error(err)
 			db.collection("user").findOne({"username" : tab_user["login"]}).then(data=>{
@@ -55,7 +55,6 @@ exports.createUser = (tab_user, jwt) => {
 					})
 				}
 			}).catch(err=>{
-				console.log("passe la")
 				db.close()
 				if (err) error("erreur recherche createUser "+err);
 			})
@@ -166,7 +165,6 @@ exports.checkUserOAUTH = (params, jwt, state) =>{
 				let info = fill_tab(state, params);
 				if (data)
 				{
-					console.log("entre DATA")
 					let t = jwt.sign({username : data.username, email : data.email}, "qwerty");
 					db.collection("user").updateOne(
 						{"username" : info["login"]},
@@ -180,7 +178,6 @@ exports.checkUserOAUTH = (params, jwt, state) =>{
 				}
 				else
 				{
-					console.log("INFO ", info)
 					let t = jwt.sign({username : info['login'], email : info['email']}, "qwerty");
 					db.collection('user').insertOne({
 						"username" : info['login'],
@@ -200,7 +197,6 @@ exports.checkUserOAUTH = (params, jwt, state) =>{
 					})
 				}
 			}).catch(err=>{
-			console.log("erreur 22" + err)
 				error(false)
 			})
 		})
@@ -230,7 +226,6 @@ exports.setProfile = (tab, params, jwt) =>{
 			if (err)
 				error("open mongo failed in getProfile")
 			db.collection("user").findOne({"username" : tab.username, "email" : tab.email}).then(data=>{
-				console.log(params)
 				if (!data)
 					error("NO data found")
 				else
@@ -277,7 +272,6 @@ exports.reset = (params, jwt) =>{
 								$set : {"tokens" : t, "password" : t}
 							}, (err, res)=>{
 								db.close()
-						console.log("change oK" , data.tokens, t)
 								if (err)
 									error("erreur reset user")
 								else
@@ -346,14 +340,9 @@ exports.verify = (token, jwt) =>{
 					{
 						db.close()
 						if (token == data.tokens)
-						{
-							console.log("identique")
 							result("true")
-						}else
-						{
-							console.log("pas identique")
+						else
 							error("false")
-						}
 					}
 				}).catch(err=>{
 					error("false")
@@ -375,10 +364,12 @@ function ajout_film(params)
 				{
 					db.collection("film").insertOne({
 						"code" : params['code'],
+						"code_Magnet" : params['code_Magnet'],
 						"imdb" : params['imdb'],
 						"id" : params["id"],
 						"comment" : [],
-						"data" : new Date().getMonth()
+						"month" : new Date().getMonth(),
+						"day" : new Date().getDate()
 						},(err, res)=>{
 						db.close()
 						return 
@@ -389,7 +380,7 @@ function ajout_film(params)
 					db.collection("film").updateOne(
 						{"_id" : data._id},
 						{
-							$set : {"date" : new Date().getMonth()}
+							$set : {"month" : new Date().getMonth(), "day" : new Date().getDate() }
 						}, (err, res)=>{
 							db.close()
 							if (err)
@@ -415,7 +406,8 @@ exports.comment = (params, decoded) =>{
 						"imdb" : params.imdb,
 						"id" : params.id,
 						"comment" : [{ login : decoded.username, comment : params.comment}],
-						"date" : new Date().getMonth()
+						"month" : new Date().getMonth(),
+						"day" : new Date().getDate()
 						},(err, res)=>{
 						db.close()
 						return 
@@ -453,20 +445,27 @@ exports.addFilm = (params, decoded) =>{
 					}
 					else
 					{
-						db.collection("user").updateOne(
-							{"_id" : data._id},
-							{
-								$push : {"film_vue" : {code : params['code'], imdb : params['imdb'] , id : params['id']}}
-							}, (err, res)=>{
-								db.close()
-								if (err)
-									error("erreur reset user")
-								else
+						let ok = false
+						for (let i = 0; i < data.film_vue.length -1; i++)
+							if (data.film_vue[i].code == params['code'] && data.film_vue[i].imdb == params["imdb"] && data.film_vue[i].id == params["id"])
+								ok = true
+						if (!ok)
+						{
+							db.collection("user").updateOne(
+								{"_id" : data._id},
 								{
-									ajout_film(params)
-									result(data);
-								}
-							})
+									$push : {"film_vue" : {code : params['code'], imdb : params['imdb'] , id : params['id']}}
+								}, (err, res)=>{
+									db.close()
+									if (err)
+										error("erreur reset user")
+									else
+									{
+										ajout_film(params)
+										result(data);
+									}
+								})
+						}
 					}
 				}).catch(err=>{
 					error("false")
@@ -483,7 +482,6 @@ exports.get_Film_User = (decoded) =>{
 				error("open mongo failed in reset")
 			else
 			{
-				console.log("USERNAME ", decoded)
 				db.collection("user").findOne({"username" : decoded.username, "email" : decoded.email}).then(data=>{
 					if (!data)
 					{
@@ -509,7 +507,6 @@ exports.get_Film = (params) =>{
 				db.collection("film").findOne({"code" : params["code"], "id" : params['id'], "imdb" : params['imdb']}).then(data=>{
 					if (!data)
 					{
-						console.log("pas toruve")
 						db.close()
 						error("NO data found")
 					}
@@ -531,7 +528,6 @@ exports.get_all_user = (decoded) =>{
 				error("open mongo failed in reset")
 			else
 			{
-				console.log("USERNAME ", decoded)
 				data = db.collection("user").find().toArray((err, res)=>{
 					if (res)
 					{
@@ -548,6 +544,56 @@ exports.get_all_user = (decoded) =>{
 					else
 						error("err")
 				})
+			}
+		})
+	})
+}
+
+exports.check_film = _=>{
+	mongo.connect("mongodb://localhost:27017/hypertube", function(err, db) {
+		if (err)
+		{
+			console.log("erreur db check_film")
+			return
+		}
+		db.collection("film").find().toArray((err, res)=>{
+			if (res)
+			{
+				let currentMonth = new Date().getMonth()
+				let currentDay = new Date().getDate()
+				res.forEach((elem, i)=>{
+					let path = "/tmp/test/"+elem.code_Magnet
+					if (elem.month < currentMonth)
+					{
+						if (elem.day < currentDay)
+						{
+							db.collection("film").remove({_id : elem._id})
+							fs.access(path , err => {
+								if (err)
+									return
+								else
+									fs.readdir(path, (err, file) =>{
+										for (let i = 0; i < file.length; i++)
+											fs.unlink(path+"/"+file[i], err=>{
+												if (err)
+													return
+											})
+										fs.rmdir(path, err=>{
+											if (err)
+												return 
+										})
+									})
+							})
+						}
+					}
+					if (i == res.length -1)
+						db.close()
+				})
+			}
+			else
+			{
+				db.close()
+				return 
 			}
 		})
 	})

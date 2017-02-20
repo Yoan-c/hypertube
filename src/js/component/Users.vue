@@ -36,7 +36,6 @@ export default {
 		},
 		search: function () {
 			var vm = this
-			console.log(this.imdb_code)
 			let token = window.localStorage.getItem("token")
 			vm.$http.post("http://localhost:8080/users", {token , token}).then(res =>{
 				if (res.body.ret == "err")

@@ -22,13 +22,11 @@ export default {
 			state = "42"
 		else
 			state = query.state;
-
 		this.$http.post('oauth', {code : query.code, state: state}).then(data =>{
-			//console.log("data " , data.data.token)
 				auth.log(data.data.token, "/search")
 			}).catch(err=>{
-				auth.logout();
-				app.redirect("/login")
+			//	auth.logout();
+		//		app.redirect("/login")
 				console.log("errr ", err)
 			})
 		},

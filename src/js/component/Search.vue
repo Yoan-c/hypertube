@@ -43,7 +43,13 @@
 				{{error}}
 				{{patiente}}
 				<li v-for="item in answer">
-					<router-link v-bind:to="'search/'+item.imdb_code+'/'+item.id+'/'+item.code">{{ item.title}} {{item.imdb_code}}<img v-bind:src=item.img /></router-link>  {{item.year}}
+					<router-link v-bind:to="'search/'+item.imdb_code+'/'+item.id+'/'+item.code" @click="init()">
+						{{ item.title}} <br/>
+						<img v-bind:src=item.img />
+						<div v-show="item.vue">
+							<img src="../../img/check-mark.svg" alt="check" width=5%/>
+						</div>
+					</router-link>
 				</li>
 			</ul>
 		</div>
@@ -71,6 +77,7 @@ export default {
 		 current_page : 1,
 		 current : 1,
 		 avance : false,
+		 check : true,
 		 answer : [],
 		 answer_avance : [],
 		 film_vue : [],
@@ -131,7 +138,8 @@ export default {
 		var vm = this
 		vm.answer = 'Thinking...'
 		let token = window.localStorage.getItem("token")
-		this.advance= false;
+		this.advance = false;
+		this.check = false;
 		if (!this.req)
 		{
 			this.answer = []
@@ -156,6 +164,8 @@ export default {
 	// user to stop typing.
 	500),
 	init : function() {
+	//	this.current_page = 0;
+	//	this.res_current = 0 
 		this.error = ""
 		this.patiente = ""
 		this.search = auth.i18n("authentication.search")
@@ -168,9 +178,10 @@ export default {
 		}
 		this.advance= false;
 	},
-	page: _.debounce(
+	page:
 	function () {
 		this.init()
+		this.check= true;
 		let token = window.localStorage.getItem("token")
 		this.$http.get('search', {params : {token : token, page : this.current_page}}).then((response) =>{
 			response.json().then((res)=>{
@@ -188,9 +199,10 @@ export default {
 			auth.logout();
 			app.redirect("/login")
 		});
-	}),
+	},
 	advanced_search : function()
 	{
+		this.check = true;
 		this.error = ""
 		if (!this.maxNote && !this.minNote && !this.minAnnee && !this.maxAnnee && !this.nomFilm && !this.genre && !this.sort && !this.order)
 		{
@@ -251,7 +263,7 @@ export default {
 					}
 				}).catch(err=>{
 					this.current = 0;
-					this.current_page = 0;
+					this.current_page = 1;
 					auth.logout();
 					app.redirect("/login")
 				})
@@ -259,6 +271,7 @@ export default {
 	},
 	_advanced : function()
 	{
+		this.check = false;
 		this.error = ""
 		this.current = 0;
 		this.$http.get("search", {params : {nom : this.res_nomFilm, genre : this.res_genre, minNote : this.res_minNote , maxNote : this.res_maxNote, minAnnee : this.res_minAnnee, maxAnnee : this.res_maxAnnee, sort : this.res_sort, order : this.res_order, page : this.res_current , av: 1}}).then(res =>{
@@ -282,8 +295,9 @@ export default {
 					data.vue = val
 				})
 		}).catch(err=>{
-			auth.logout();
-			app.redirect("/login")
+			console.log("errueru ", err)
+		//	auth.logout();
+			//app.redirect("/login")
 		})
 	},
 	modif_profile : function ()
@@ -292,19 +306,21 @@ export default {
 		}
 	},
 	mounted : function () {
+		this.current_page = 1;
+		this.res_current = 1 
 		this.page();
 		$(window).scroll( () =>  {
-			if ($(document).height() - $(window).height() == $(window).scrollTop()) {
-				this.current_page++
-				this.res_current++
+			if ($(document).height() - $(window).height() == $(window).scrollTop() && this.check && $(window).scrollTop() > 0) {
 				if (!this.avance)
 				{
-					this.res_current = 0
+					this.current_page++
+					this.res_current = 1 
 					this.page();
 				}
 				else
 				{
-					this.current_page = 0;
+					this.res_current++
+					this.current_page = 1;
 					this._advanced()
 				}
 			}

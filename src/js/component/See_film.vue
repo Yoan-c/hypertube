@@ -53,7 +53,6 @@ export default {
 		search: _.debounce(
 		function () {
 			var vm = this
-			console.log("imdb ",this.imdb)
 			let token = window.localStorage.getItem("token")
 			vm.$http.get('search', {params : {imdb : this.imdb, code : this.code, id : this.id, token : token}} ).then((response) =>{
 				response.json().then((res)=>{
@@ -68,7 +67,6 @@ export default {
 					this.resume = res.resume
 					this.note = res.note+"/10"
 					this.info = this.released+" / "+this.time+" / "+this.genre
-					console.log("resr ",res.film);
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
 						this.comments.push({"comment" : elem.comment, "login" : elem.login})
@@ -87,10 +85,8 @@ export default {
 			this.comment = ""
 		},
 		voir : function (){
-			console.log(this.tab.magnet)
 			let token = window.localStorage.getItem("token")
 			this.$http.post("see", {magnet : this.tab.magnet , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
-				console.log("data seen", data)
 			}).catch(err=>{
 				console.log("erreur seen", err)
 			})

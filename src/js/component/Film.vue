@@ -67,10 +67,8 @@ export default {
 		}
 	},
 	methods: {
-		search: _.debounce(
-		function () {
+		search: function () {
 			var vm = this
-			console.log("imdb ",this.imdb)
 			let token = window.localStorage.getItem("token")
 			vm.$http.get('search', {params : {imdb : this.imdb, code : this.code, id : this.id, token : token}} ).then((response) =>{
 				response.json().then((res)=>{
@@ -86,7 +84,6 @@ export default {
 					this.note = res.note+"/10"
 					this.info = this.released+" / "+this.time+" / "+this.genre
 					this.torrent = res.torrents
-					console.log("resr ",res.torrents);
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
 						this.comments.push({"comment" : elem.comment, "login" : elem.login})
@@ -97,7 +94,7 @@ export default {
 				auth.logout();
 				app.redirect("/login")
 			});
-		}),
+		},
 		add : function () {
 			let token = window.localStorage.getItem("token")
 			this.$http.post("http://localhost:8080/comment",{comment : this.comment, token : token , code : this.code, id : this.id, imdb : this.imdb})

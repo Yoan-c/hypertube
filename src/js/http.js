@@ -16,6 +16,9 @@ var mimeTypes = {
 	 "html": "text/html",
 	};
 
+// One week in seconde
+let Sec_Semaine = 60*60*24*7
+
 apiArray["42"] = {
 	uri_co : "https://api.intra.42.fr/oauth/token",
 	client_id : "8a8c56a0edca0a04a3e1b89b70ba2a4b79f03f2c07784856a8d21d89547d9039",
@@ -72,6 +75,8 @@ var fill_data = (result, jwt, state, res) => {
 		})
 }
 
+setInterval(data.check_film, Sec_Semaine*2*1000);
+
 let server = http.createServer(function (req, res){
 	res.setHeader("Access-Control-Allow-Origin", "*");
 	res.setHeader("Content-Type", "application/json");
@@ -113,7 +118,6 @@ let server = http.createServer(function (req, res){
 					console.log("erreur http checkTorrent")
 					res.writeHead(401, {'Content-Type': 'text/html'});
 					res.write('Erreur');
-					console.log("test")
 					res.end()
 				}
 				else
@@ -134,12 +138,10 @@ let server = http.createServer(function (req, res){
 						{
 							search.getFile(params["id"], params["code"], params["imdb"]).then((result) => {
 								data.get_Film(params).then(resultat=>{
-									console.log("RESULTAT ", resultat)
 									result.film = resultat
 									res.write(JSON.stringify(result));
 									res.end();
 								}).catch(err=>{
-									console.log("PAS TROUVEEEE ")
 									result.film = "" 
 									res.write(JSON.stringify(result));
 									res.end();
@@ -162,7 +164,6 @@ let server = http.createServer(function (req, res){
 						}
 						else if (params && Number(params['av']) && params['av'] == 1)
 						{
-							console.log(params)
 							search.advance(params).then(resultat =>{
 								data.get_Film_User(decoded).then((result)=>{
 									if (resultat == "FIN")
@@ -181,7 +182,7 @@ let server = http.createServer(function (req, res){
 							res.end();
 							})
 						}
-						else
+						else if (params && params["page"])
 						{
 							if (!params["page"])
 								params["page"] = '1'
@@ -204,9 +205,7 @@ let server = http.createServer(function (req, res){
 					{
 						if (params['modif'] == "false")
 						{
-							console.log(":A")
 							data.getProfile(decoded).then((data) =>{
-								console.log("Data profile " , data)
 								res.write(JSON.stringify(data));
 								res.end();
 							}).catch(err=>{
@@ -219,7 +218,6 @@ let server = http.createServer(function (req, res){
 							if (params["password"])
 								params["password"] = whirlpool(params["password"])
 							data.setProfile(decoded, params, jwt).then(data =>{
-								console.log("Modification success" + data)
 								let response = {
 									token : data,
 									result : true,
@@ -228,7 +226,6 @@ let server = http.createServer(function (req, res){
 								res.write(JSON.stringify(response));
 								res.end();
 							}).catch(err=>{
-								console.log("Modification failed " + err)
 								res.write(JSON.stringify(err));
 								res.end();
 							})
@@ -238,7 +235,6 @@ let server = http.createServer(function (req, res){
 					{
 						if (params.comment)
 						{
-							console.log("params ", params)
 							data.comment(params, decoded)
 							res.end()
 						}
@@ -249,7 +245,6 @@ let server = http.createServer(function (req, res){
 					{
 						params = querystring.parse(url.parse(req.url).query);
 						search.search_sub(params, path).then(data=>{
-							console.log("data ", data)
 								res.write(JSON.stringify(data));
 							res.end()
 						})
@@ -258,24 +253,22 @@ let server = http.createServer(function (req, res){
 					{
 						if (params && params["magnet"], params['code'] && params['imdb'] && params['id'])
 						{
-
-							console.log(params["magnet"])
+							let code_Magnet = params["magnet"].split(":")
+							code_Magnet = code_Magnet[(code_Magnet.length -1)]
+							params["code_Magnet"] = code_Magnet;
 							let magnet = params["magnet"]
 							let client = new StreamClient()
 							client.add(magnet)
 							client.on("message", data=>{
-								console.log("message ", data)
 								res.write(JSON.stringify({"data" : data}));
 								res.end();
 							})
 							client.on("err", data=>{
-								console.log("error ", data)
 								res.write(JSON.stringify({"err" : data}));
 								res.end();
 							})
 							data.addFilm(params, decoded).then(data=>{
 							}).catch(err=>{
-								console.log("err FILM ", err)
 								res.write(JSON.stringify({"err" : data}));
 								res.end();
 							})
@@ -364,14 +357,12 @@ let server = http.createServer(function (req, res){
 				if (params['login'] && params['mail'])
 				{
 					data.reset(params, jwt).then(data=>{
-						console.log(data)
 						mail.sendMail(params, data).then(response=>{
-							console.log("email send")
 							res.write(JSON.stringify({status : "ok"}))
 							res.end()
 							
 						}).catch(err =>{
-							console.log("email not send", err)
+							res.write(JSON.stringify({status : "email"}))
 							res.end()
 							
 						})
@@ -407,7 +398,6 @@ let server = http.createServer(function (req, res){
 			{
 				if (params["token"])
 					data.verify(params["token"], jwt).then(data=>{
-						console.log("ici", data)
 						res.write(JSON.stringify({"success" : data}))
 						res.end()
 					}).catch(err=>{
@@ -417,7 +407,7 @@ let server = http.createServer(function (req, res){
 				else
 					res.end()
 			}
-			else if (query == "/oauth/")
+			else if (query == "/oauth")
 			{
 				 request({
 					 uri :  (apiArray[params['state']]) ? apiArray[params['state']].uri_co : "null",
@@ -464,27 +454,21 @@ let server = http.createServer(function (req, res){
 			}
 			else{
 
-						query = url.parse(req.url).pathname;
-						query = querystring.unescape(query)
-				var filename = path.join(process.cwd(), query);
-							console.log('request for', filename);
-						fs.exists(filename, function(exists) {
-							if(!exists) {
-								console.log("not exists: " + filename);
-								res.writeHead(200, {'Content-Type': 'text/plain'});
-								res.write('404 Not Found\n');
-								res.end();
-								return 
-							}
-
-							console.log('Found');
-
-							res.writeHead(200, "text/plain");
-							var fileStream = fs.createReadStream(filename);
-							fileStream.pipe(res);
-						});
-
-//				res.end()
+					query = url.parse(req.url).pathname;
+					query = querystring.unescape(query)
+					var filename = path.join(process.cwd(), query);
+					fs.exists(filename, function(exists) {
+						if(!exists) {
+							res.writeHead(200, {'Content-Type': 'text/plain'});
+							res.write('404 Not Found\n');
+							res.end();
+							return 
+						}
+						res.writeHead(200, "text/plain");
+						var fileStream = fs.createReadStream(filename);
+						fileStream.pipe(res);
+					});
+				//res.end()
 			}
 		}
 	})

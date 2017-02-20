@@ -133,7 +133,7 @@ function getFile(id, code, IMDB)
 		//let id = parseInt(IMDB, 10);
 		if (reg.exec(IMDB) && code == "Y" && id)
 		{
-			console.log("test")
+			console.log("test get file")
 			let resp = YTS.get({ "uri" : "list_movies.json",
 				"query" : {
 					"query_term" : IMDB,
@@ -424,7 +424,7 @@ function advance(params){
 						}
 					}
 				}
-				console.log("test ",tabFile.length)
+				console.log("test advance ",tabFile.length)
 				if (tabFile.length <= 0)
 				{
 					if ((res.data.movie_count / page) < 50)
@@ -452,13 +452,13 @@ exports.search_sub = (params, path) =>{
 	return new Promise ((yes , no) =>{
 		var filename = path.join(process.cwd(), Paths);
 		fs.exists(filename, exists => {
-				if(!exists) {
+				if(!exists)
 					yes("") 
-				}
 			new Promise ((response, error) =>{
 				let lang_path = path.join(filename, 'en') 
 				fs.exists(lang_path, exists => {
-					if(!exists) return response("")
+					if(!exists)
+						return response("")
 					fs.readdir(lang_path, (err, files) => {
 					response(files)
 					})
@@ -467,13 +467,20 @@ exports.search_sub = (params, path) =>{
 				new Promise ((res, err) =>{
 					let lang_path = path.join(filename, 'fr') 
 					fs.exists(lang_path, exists => {
-						if(!exists) return res("")
+						if(!exists)
+						{ 
+							if (data)
+								return res({"en" : data})
+							else
+								return res("")
+						}
 						fs.readdir(lang_path, (err, files) => {
 						res({"fr" : files, "en" : data})
 						})
 					})
 				}).then(data =>{
 					tab = data
+					console.log("response ", tab)
 					yes(tab)
 				})
 			

@@ -19,7 +19,6 @@ export default {
 			}
 			else if (!data.body.status)
 			{
-				console.log("la erroo", data.body.err)
 				context.error = this.i18n(data.body.err)
 			}
 		}).catch(err =>{
@@ -29,7 +28,6 @@ export default {
 		log(token, redirect){
 			if (token)
 			{
-				console.log("TOKEN "+ token)
 					window.localStorage.setItem("token", token)
 					if (redirect)
 						app.redirect(redirect)
@@ -41,12 +39,10 @@ export default {
 		signup(context, redirect){
 			context.$http.post("login", {create : true, login : context.login, password : context.password, lastname : context.lastname, firstname : context.firstname, mail : context.mail, photo : context.photo}).then(data =>
 					{
-						console.log(data)
 				if (data.body.result)
 			{
 				app.add_token(data.body.token)
 				window.localStorage.setItem("token", data.body.token)
-				console.log("compte bien cree 2")
 				if (redirect)
 					app.redirect(redirect)
 			}
