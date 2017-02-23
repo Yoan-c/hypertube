@@ -126,7 +126,8 @@ export default {
   watch : {
 	req : function (newReq)
 	{
-		this.answer = "searching..."
+		this.patiente = "searching..."
+		this.answer = []
 		this.getFilm()
 	}
   },
@@ -134,12 +135,11 @@ export default {
 	getFilm: _.debounce(
 	function () {
 		this.error = ""
-		this.patiente = ""
 		var vm = this
-		vm.answer = 'Thinking...'
 		let token = window.localStorage.getItem("token")
 		this.advance = false;
 		this.check = false;
+		this.answer = []
 		if (!this.req)
 		{
 			this.answer = []
@@ -147,15 +147,20 @@ export default {
 		}
 		else
 			vm.$http.get('http://localhost:8080/search',{params : {name : this.req, token : token}} ).then((res) =>{
-				console.log(res)
-				this.answer = res.body.films
-				this.film_vue = res.body.film_vue
-				this.answer.forEach(data=>{
-					let val = res.body.film_vue.some(elem=>{
-						return (elem.id == data.id && elem.imdb == data.imdb_code && elem.code == data.code)
+				if (res.body && res.body.films)
+				{
+					this.patiente = ""
+					this.answer = res.body.films
+					this.film_vue = res.body.film_vue
+					this.answer.forEach(data=>{
+						let val = res.body.film_vue.some(elem=>{
+							return (elem.id == data.id && elem.imdb == data.imdb_code && elem.code == data.code)
+						})
+						data.vue = val
 					})
-					data.vue = val
-				})
+				}
+				else if (res.body.ret == "NO" || res.body.films.length == 0)
+					this.patiente = auth.i18n("error.empty_film")
 			}).catch(err=>{
 				console.log("err ", err)
 			})
@@ -231,15 +236,16 @@ export default {
 				this.error = auth.i18n("error.year")
 			else
 				this.$http.get("search", {params : {nom : this.nomFilm, genre : this.genre, minNote : this.minNote , maxNote : this.maxNote, minAnnee : this.minAnnee, maxAnnee : this.maxAnnee, sort : this.sort, order : this.order, page : this.current , av: 1}}).then(res =>{
-
-					if (res.body.ret && res.body.ret == "FIN")
+					if (res.body.ret && res.body.ret == "FIN" || res.body.ret == "NO")
 					{
 						this.patiente = ""
-						this.error = auth.i18n("search.end")
+						if (res.body.ret == "FIN")
+							this.error = auth.i18n("search.end")
+						else
+							this.patiente = auth.i18n("error.empty_film")
 					}
 					else
 					{
-						console.log("la" , res, this.current)
 						this.answer_avance = this.answer.concat(res.body.films)
 						if (res.body.size < 1)
 						{
@@ -264,8 +270,9 @@ export default {
 				}).catch(err=>{
 					this.current = 0;
 					this.current_page = 1;
-					auth.logout();
-					app.redirect("/login")
+					console.log("errr ", err)
+					//auth.logout();
+					//app.redirect("/login")
 				})
 		}
 	},
@@ -295,9 +302,9 @@ export default {
 					data.vue = val
 				})
 		}).catch(err=>{
-			console.log("errueru ", err)
-		//	auth.logout();
-			//app.redirect("/login")
+			console.log("erreur ", err)
+			auth.logout();
+			app.redirect("/login")
 		})
 	},
 	modif_profile : function ()

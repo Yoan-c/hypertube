@@ -7,6 +7,7 @@ let http = require("http");
 let fs = require("fs");
 let AdmZip = require("adm-zip");
 let srt_to_vtt = require("srt-to-vtt-bulk")
+let opensubtitles = require("subtitler");
 
 let YTS = new RequestClient ({
 	baseUrl : "https://yts.ag/api/v2/",
@@ -39,7 +40,7 @@ let Info_file = {
 	"magnet" : null
 }
 
-function getSubtitle(IMDB)
+function getSubtitle(IMDB, title)
 {
 	var download = function(filename, url) {
 		var tmpFilePath = filename + ".zip"
@@ -79,16 +80,34 @@ function getSubtitle(IMDB)
 			console.log("rep already subtitles exits")
 		})
 		fs.access("./subtitles/"+IMDB, fs.constants.R_OK | fs.constants.W_OK, (err) => {
-			if (data[IMDB])
-				fs.mkdir("./subtitles/"+IMDB, (err) =>{
-					if (!err)
+				console.log("data1")
+			fs.mkdir("./subtitles/"+IMDB, (err) =>{
+				if (!err)
+				{
+					if (data[IMDB])
 					{
-						if (data[IMDB].french && data[IMDB].french.url)
-							download("./subtitles/"+IMDB+"/fr", data[IMDB].french.url)
-						if (data[IMDB].english && data[IMDB].english.url)
-							download("./subtitles/"+IMDB+"/en", data[IMDB].english.url)
+						console.log("data")
+								if (data[IMDB].french && data[IMDB].french.url)
+									download("./subtitles/"+IMDB+"/fr", data[IMDB].french.url)
+								if (data[IMDB].english && data[IMDB].english.url)
+									download("./subtitles/"+IMDB+"/en", data[IMDB].english.url)
 					}
-				})
+					else
+					{
+						opensubtitles.api.login().then(token =>{
+							opensubtitles.api.searchForTitle(token, "fre", title).done(subFr =>{
+								if (subFr && subFr[0] && subFr[0].ZipDownloadLink)
+								download("./subtitles/"+IMDB+"/fr", subFr[0].ZipDownloadLink)
+							})
+							opensubtitles.api.searchForTitle(token, "eng", title).done(subEn =>{
+								if (subEn && subEn[0] && subEn[0].ZipDownloadLink)
+								download("./subtitles/"+IMDB+"/en", subEn[0].ZipDownloadLink)
+							})
+							opensubtitles.api.logout(token);
+						})
+					}
+				}
+			})
 		});
 	})
 }
@@ -109,7 +128,7 @@ function Fill_infoFile(val, code)
 	Info_file.imdb_code = val.imdbid;
 	if (code == "Y")
 	{
-		console.log("INFO MAGNET " + Object.keys(Info_file.torrents).length)
+		//console.log("INFO MAGNET " + Object.keys(Info_file.torrents).length)
 		let nb_torrent = Object.keys(Info_file.torrents).length
 			Info_file.magnet = [];
 		for (let i = 0 ; i < nb_torrent; i++)
@@ -133,7 +152,7 @@ function getFile(id, code, IMDB)
 		//let id = parseInt(IMDB, 10);
 		if (reg.exec(IMDB) && code == "Y" && id)
 		{
-			console.log("test get file")
+			//console.log("test get file")
 			let resp = YTS.get({ "uri" : "list_movies.json",
 				"query" : {
 					"query_term" : IMDB,
@@ -152,7 +171,7 @@ function getFile(id, code, IMDB)
 					Info_file.leechers = res.data.movies[0].torrents[0].peers;
 					File_info.getById(IMDB).then( (val) => {
 						Fill_infoFile(val, "Y")
-						getSubtitle(IMDB)
+						getSubtitle(IMDB, val.title)
 						return response(Info_file);
 					});
 				}
@@ -178,7 +197,7 @@ function getFile(id, code, IMDB)
 					Info_file.imdb_code = IMDB;
 					File_info.getById(IMDB).then( (val) => { 
 						Fill_infoFile(val, "P")
-						getSubtitle(IMDB)
+						getSubtitle(IMDB, val.title)
 						Info_file.img = val.poster;
 						return response(Info_file)
 					});
@@ -304,16 +323,17 @@ function getFile_by_tag(name){
 			}
 			if (i < 20)
 			{
-
 				const MAX_RESULT = 20
-
 				PirateBay.search(name, {
 					category : 'video',
 				}).then((result)=>{
 					let res = [];
 					let l = 0;
 					let id ;
-
+					if (i == 0 && result.length == 0)
+					{
+						response("")
+					}
 					for (let i = 0 ; i < result.length; i++)
 					{
 						id = parseInt(result[i].subcategory.id, 10);
@@ -349,26 +369,28 @@ function getFile_by_tag(name){
 							}
 							else {
 								err++ ;
-								console.log(err, res.length)
+					//			console.log(err, res.length)
 							}
 							if (tabFile.length == res.length + i - err 
 								|| tabFile.length == MAX_RESULT)
 							{
-								console.log("TESTiuprtghwi rtg " +j)
+					//			console.log("TESTiuprtghwi rtg " +j)
 								return response(tabFile);
 							}
 						})
 					}
+					if ((res && res.length == 0) || !res)
+						response("NO")
 				}).catch((err) =>{
 					console.log("err" + err);
 				});
 			}
 			else
 			{
-				console.log("TESTi34756347653476" )
+				//console.log("TESTi34756347653476" )
 				return response(tabFile)
 			}
-	console.log("Hors de la fonction ")
+	//console.log("Hors de la fonction ")
 		})
 	})
 }
@@ -408,7 +430,7 @@ function advance(params){
 					{
 						if (Number(elem.year) >= Number(minAnnee) && Number(elem.year) <= Number((maxAnnee < 0)? elem.year : maxAnnee))
 						{
-							console.log("entre", elem.rating , elem.year, elem.title, elem.genres)
+							//console.log("entre", elem.rating , elem.year, elem.title, elem.genres)
 							tabFile.push({
 								id : elem.id,
 								title : elem.title,
@@ -424,12 +446,12 @@ function advance(params){
 						}
 					}
 				}
-				console.log("test advance ",tabFile.length)
+				//console.log("test advance ",tabFile.length)
 				if (tabFile.length <= 0)
 				{
 					if ((res.data.movie_count / page) < 50)
 					{
-						console.log("FFFFFFFFFFFFFFIIIIIIIIIIIIINNNNNNNNNNNNNNNN")
+						//console.log("FFFFFFFFFFFFFFIIIIIIIIIIIIINNNNNNNNNNNNNNNN")
 						response("FIN")
 					}
 					else
@@ -438,6 +460,7 @@ function advance(params){
 				else
 					response(tabFile)
 			}
+			response("NO")
 		})
 	
 	})
@@ -464,6 +487,7 @@ exports.search_sub = (params, path) =>{
 					})
 				})
 			}).then(data =>{
+				//console.log("data sub ", data)
 				new Promise ((res, err) =>{
 					let lang_path = path.join(filename, 'fr') 
 					fs.exists(lang_path, exists => {
@@ -480,7 +504,7 @@ exports.search_sub = (params, path) =>{
 					})
 				}).then(data =>{
 					tab = data
-					console.log("response ", tab)
+					//console.log("response ", tab)
 					yes(tab)
 				})
 			

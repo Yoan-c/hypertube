@@ -152,7 +152,10 @@ let server = http.createServer(function (req, res){
 						{
 							search.getFile_by_tag(params["name"]).then((resultat) => {
 								data.get_Film_User(decoded).then((result)=>{
-									res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
+									if (resultat == "FIN" || resultat == "NO")
+										res.write(JSON.stringify({"ret" : resultat}));
+									else
+										res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
 									res.end();
 								}).catch(err=>{
 									res.write(JSON.stringify(err));
@@ -166,7 +169,7 @@ let server = http.createServer(function (req, res){
 						{
 							search.advance(params).then(resultat =>{
 								data.get_Film_User(decoded).then((result)=>{
-									if (resultat == "FIN")
+									if (resultat == "FIN" || resultat == "NO")
 										res.write(JSON.stringify({"ret" : resultat}));
 									else 
 										res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));

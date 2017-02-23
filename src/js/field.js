@@ -42,7 +42,8 @@ exports.field = {
 			user : "User not found : please check your login and/or password",
 			year : "Please check years",
 			note : "Please check rating",
-			def : "An error has occured, you will be redirect in few secondes"
+			def : "An error has occured, you will be redirect in few secondes",
+			empty_film : "sorry no film"
 		}
 	},
 
@@ -87,7 +88,8 @@ exports.field = {
 			mail : "Adresse mail deja utilise",
 			year : "Verifier l'annee",
 			note : "Verifier les notes",
-			field : "Veuillez remplir tous les champs"
+			field : "Veuillez remplir tous les champs",
+			empty_film : "sorry no film"
 		}
 	}
 }

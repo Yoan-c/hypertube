@@ -16,12 +16,8 @@
 			</div>
 		</div>
 		<div>
-			 <div v-if="see">
-				<video width="480" controls crossorigin="anonymous">
-					<source :src=lien>
-						<track v-for="(item, i) in sub" kind="subtitles" :srclang ="i" :label ="i" :src="'http://localhost:8080/subtitles/'+imdb+'/'+i+'/'+item[0]" crossorigin="anonymous">
+			<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264" preload controls crossorigin="anonymous">
 			 	</video>
-			 </div>
 			<p style="color: blue;" v-for="value in comments"> {{value.login}} {{value.comment}} </p>
 			<textarea v-model="comment" placeholder="comment"></textarea>
 			<button v-on:click="add">Add </button><br/>
@@ -108,15 +104,15 @@ export default {
 		voir : function (){
 			let token = window.localStorage.getItem("token")
 			this.$http.post("see", {magnet : this.tab.magnet[this.picked] , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
-				console.log("data seen", data)
 				if (data && data.body && data.body.data)
 				{
 					this.$http.get("subtitle", {params : {imdb : this.imdb, token : token}}).then(res=>{
 					
-					console.log("test ", res)
-					this.sub = res.body
-						this.lien = "http://"+data.body.data.url
+					let sub = res.data
+
 					this.see = true
+					this.init_player(data.data.data, sub)
+						//	this.lien = "http://"+data.body.data.url
 					}).catch(err=>{
 						console.log("erreur ", err)
 					})
@@ -126,6 +122,61 @@ export default {
 			}).catch(err=>{
 				console.log("erreur seen", err)
 			})
+		},
+		init_player : function (data, subtitles){
+			let video = videojs('player', {
+				controls: true,
+				plugins: {
+					videoJsResolutionSwitcher: {
+						default: 'high',
+						dynamicLabel: true
+					}
+				}
+			})
+
+			console.log(data)
+
+			video.duration = _ => Math.floor(data.duration)
+			video.oldCurrentTime = video.currentTime
+
+			let currentTime = time => {
+				if(time == undefined) {
+					return video.oldCurrentTime() + video.start;
+				}
+
+				time = Math.floor(time)
+				video.start = time;
+
+				video.oldCurrentTime(time)
+
+				console.log(video.currentTime(), time, video.duration())
+
+				//let old_src = video.src().replace(/\?start=[\d]+/, '')
+				//video.src(old_src);
+				setTimeout(function() {
+					video.play();
+				}, 100);
+				return this;
+			}
+
+			video.currentTime = currentTime
+			
+			video.updateSrc(data.transcoded.map( (preset) => {
+				return {type: 'video/webm', src: preset.stream, label: preset.quality}
+			}))
+
+
+			for (let i in subtitles) {
+				let sub = subtitles[i]
+				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i }, true);
+			}
+
+			video.on('resolutionchange', _ => {
+				let resolution = video.currentResolution()
+				video.currentTime(video.currentTime())
+			})
+
+			video.currentTime(1)
 		}
 	},
 	mounted : function () {
