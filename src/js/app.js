@@ -31,8 +31,8 @@ const default_lang = "EN"
 const tab_lang = ["FR", "EN"]
 let path_auto = ["/login", "/oauth/42/callback", "/oauth/google/callback", "/oauth/slack/callback", "/oauth/facebook/callback", "/oauth/github/callback", "/forget", "/reset"]
 
-//const api_url = 'http://e3r10p6.42.fr:8080'
-const api_url = 'http://localhost:8080'
+const api_url = 'http://e3r10p6.42.fr:8080'
+//const api_url = 'http://localhost:8080'
 
 Vue.http.options.root = api_url
 
@@ -62,7 +62,7 @@ const routes =
 		{ path: '/oauth/github/callback', component: Oauth },
 		{ path: '/search', alias: '/', component: Search },
 		{ path: '/users', component: Users },
-	/*	{ path: '/See_film/:data', component: See_film, 
+	/*	{ path: '/See_film/:data', component: See_film,
 			beforeEnter : (to, from, next)=>{
 				if (to.params && to.params.data)
 					next();

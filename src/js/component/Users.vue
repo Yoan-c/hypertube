@@ -5,7 +5,7 @@
 		<ul>
 			<li v-for="item in answer">
 				{{login}} : {{item.username}}
-				{{firstname}} : {{item.first_name}} 
+				{{firstname}} : {{item.first_name}}
 				{{lastname}} :  {{item.last_name}}
 				{{picture}} : <img :src=item.picture />
 			</li>
@@ -37,7 +37,7 @@ export default {
 		search: function () {
 			var vm = this
 			let token = window.localStorage.getItem("token")
-			vm.$http.post("http://localhost:8080/users", {token , token}).then(res =>{
+			vm.$http.post("users", {token , token}).then(res =>{
 				if (res.body.ret == "err")
 					this.erreur = "erreur"
 				else

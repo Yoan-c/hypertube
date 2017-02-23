@@ -4,11 +4,14 @@ let request = require("request");
 let tab_fct = []
 let fs = require('fs');
 
+const mongo_url = 'mongodb://e3r10p6.42.fr:27017/hypertube'
+//const mongo_url = 'mongodb://localhost:27017/hypertube'
+
 exports.createUser = (tab_user, jwt) => {
 
 	return new Promise ((result, error) =>
 	{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err) error(err)
 			db.collection("user").findOne({"username" : tab_user["login"]}).then(data=>{
 				if (err)
@@ -67,7 +70,7 @@ exports.userAutentication = (login, password, jwt) =>{
 
 	return new Promise ((result, error) =>
 	{
-		mongo.connect("mongodb://localhost:27017/hypertube", function (err, db){
+		mongo.connect(mongo_url, function (err, db){
 			if (err) error("erreur de connection")
 			db.collection("user").findOne({"username" : login}).then(data=>{
 				if (data && data.password && password && password === data.password)
@@ -100,7 +103,7 @@ exports.userAutentication = (login, password, jwt) =>{
 
 exports.checkToken = (token) =>{
 	return new Promise((result, error) =>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function (err, db){
+		mongo.connect(mongo_url, function (err, db){
 			if (err) error("erreur recherche de token")
 			db.collection("user").findOne({"tokens" : token}).then(data=>{
 				db.close();
@@ -152,7 +155,7 @@ function fill_tab (state, params)
 
 exports.checkUserOAUTH = (params, jwt, state) =>{
 	return new Promise((result, error) =>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function (err, db){
+		mongo.connect(mongo_url, function (err, db){
 			if (err) error("erreur recherche de OAUTH")
 			if (state == "google")
 				var email  = params["emails"][0].value
@@ -163,7 +166,7 @@ exports.checkUserOAUTH = (params, jwt, state) =>{
 			else
 				var email  = params.email
 			db.collection("user").findOne({"email" : email}).then(data=>{
-				
+
 				let info = fill_tab(state, params);
 				if (data)
 				{
@@ -207,7 +210,7 @@ exports.checkUserOAUTH = (params, jwt, state) =>{
 
 exports.getProfile = (tab) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in getProfile")
 			db.collection("user").findOne({"username" : tab.username, "email" : tab.email}).then(data=>{
@@ -224,7 +227,7 @@ exports.getProfile = (tab) =>{
 
 exports.setProfile = (tab, params, jwt) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 			{
 				db.close()
@@ -245,7 +248,7 @@ exports.setProfile = (tab, params, jwt) =>{
 							$set :	{"email" : (params['email']) ? params['email'] : tab.email, "profil_picture" : params['photo'], "first_name" : (params['first_name']) ? params['first_name'] : data.first_name, "last_name" : (params['last_name']) ? params['last_name'] : data.last_name , "langue" : (params['langue']) ? params['langue'] : data.langue , "password" : (params['password']) ? params['password'] : data.password, tokens : token}
 						}, (err, res) =>{
 							db.close();
-							if (err) 
+							if (err)
 								error("erreur update user")
 							else
 								result(token);
@@ -260,7 +263,7 @@ exports.setProfile = (tab, params, jwt) =>{
 
 exports.reset = (params, jwt) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in reset")
 			db.collection("user").findOne({"username" : params['login'], "email" : params['mail']}).then(data=>{
@@ -297,7 +300,7 @@ exports.reset = (params, jwt) =>{
 
 exports.resetPass = (params, jwt) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in reset")
 			else
@@ -333,7 +336,7 @@ exports.resetPass = (params, jwt) =>{
 
 exports.verify = (token, jwt) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in reset")
 			else
@@ -362,7 +365,7 @@ exports.verify = (token, jwt) =>{
 
 function ajout_film(params)
 {
-	mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+	mongo.connect(mongo_url, function(err, db){
 		if (err)
 			return
 		else
@@ -380,7 +383,7 @@ function ajout_film(params)
 						"day" : new Date().getDate()
 						},(err, res)=>{
 						db.close()
-						return 
+						return
 					})
 				}
 				else
@@ -401,7 +404,7 @@ function ajout_film(params)
 }
 
 exports.comment = (params, decoded) =>{
-	mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+	mongo.connect(mongo_url, function(err, db){
 		if (err)
 			return
 		else
@@ -418,7 +421,7 @@ exports.comment = (params, decoded) =>{
 						"day" : new Date().getDate()
 						},(err, res)=>{
 						db.close()
-						return 
+						return
 					})
 				}
 				else
@@ -440,7 +443,7 @@ exports.comment = (params, decoded) =>{
 
 exports.addFilm = (params, decoded) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in reset")
 			else
@@ -485,7 +488,7 @@ exports.addFilm = (params, decoded) =>{
 
 exports.get_Film_User = (decoded) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in reset")
 			else
@@ -507,7 +510,7 @@ exports.get_Film_User = (decoded) =>{
 }
 exports.get_Film = (params) =>{
 	return new Promise ((result, error)=>{
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in reset")
 			else
@@ -531,7 +534,7 @@ exports.get_Film = (params) =>{
 exports.get_all_user = (decoded) =>{
 	return new Promise ((result, error)=>{
 		let tab_user = [];
-		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
+		mongo.connect(mongo_url, function(err, db){
 			if (err)
 				error("open mongo failed in reset")
 			else
@@ -559,7 +562,7 @@ exports.get_all_user = (decoded) =>{
 }
 
 exports.check_film = _=>{
-	mongo.connect("mongodb://localhost:27017/hypertube", function(err, db) {
+	mongo.connect(mongo_url, function(err, db) {
 		if (err)
 		{
 			console.log("erreur db check_film")
@@ -589,7 +592,7 @@ exports.check_film = _=>{
 											})
 										fs.rmdir(path, err=>{
 											if (err)
-												return 
+												return
 										})
 									})
 							})
@@ -602,7 +605,7 @@ exports.check_film = _=>{
 			else
 			{
 				db.close()
-				return 
+				return
 			}
 		})
 	})
