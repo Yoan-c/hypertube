@@ -93,7 +93,7 @@ router.beforeEach((to, from, next)=>{
 	if (token)
 	{
 		Vue.http.headers.common["Authorization"] = "Bearer "+token
-		console.log("router add " + Vue.http.headers.common["Authorization"])
+		//console.log("router add " + Vue.http.headers.common["Authorization"])
 	}
 	else
 		delete Vue.http.headers.common["Authorization"]
@@ -111,8 +111,11 @@ import auth from "./function.js"
 new Vue ({
 	router,
 	data : {
-		log : auth.i18n("authentication.logout"),
-		other_user : auth.i18n("search.users")
+		connect : auth.i18n("authentication.sign_in"),
+		Out : auth.i18n("authentication.logout"),
+		other_user : auth.i18n("search.users"),
+		profile : auth.i18n("authentication.profile"),
+		search : auth.i18n("authentication.search")
 	},
 	http: {
 		root: '/',

@@ -5,22 +5,27 @@ exports.field = {
 	{
 		authentication :
 		{
+			connect : "Login In",
+			pseudo : "Pseudo",
+			nom : "Name",
+			creation : "Sing In",
 			login : "Login",
 			last_name : "Last name",
 			first_name : "First_name",
 			email : "E-mail",
-			photo : "Profile picture",
+			photo : "Profil picture",
 			lang : "Language",
 			password : "Password",
 			conf_password : "Password confirmation",
 			modify : "update",
-			profile : "Profile",
+			profile : "My Profil",
 			search : "search",
 			logout : "logout",
 			enter_login : "Enter your login",
 			enter_mail : "Enter your E-mail",
 			submit : "Submit",
 			sign_in : "Sing in",
+			sign_up : "Already signed up ? ",
 			create : "Create an account",
 			forget_pass : "Forget password ?"
 		},
@@ -51,28 +56,33 @@ exports.field = {
 	{
 		authentication : 
 		{
+			connect : "Connection",
+			nom : "Nom",
+			pseudo : "Pseudo",
+			creation : "Nouveau compte",
 			login : "Identifiant",
 			last_name : "Prenom",
-			first_name : "Nom de famille",
+			first_name : "Nom famille",
 			email : "Email",
-			photo : "Image de profile",
+			photo : "Image de profil",
+			sign_up : "Déja inscrit ? ",
 			lang : "Langue",
 			password : "Mot de passe",
 			conf_password : "Confirmation du mot de passe",
 			modify : "modifier",
-			profile : "profile",
+			profile : "Mon profil",
 			search : "Recherche",
 			logout : "se deconnecter",
 			enter_login : "Saisissez votre identifiant",
 			enter_mail : "Saisissez votre email",
 			submit : "Valider",
-			sign_in : "Connecter",
+			sign_in : "Se connecter",
 			create : "Creer un compte",
 			forget_pass : "Mot de passe oublie ?"
 		},
 		search : {
 			end : "Fin de la recherche",
-			users : "Tous les utilisateurs",
+			users : "utilisateurs",
 			wait : "Patientez quelques instants"
 		},
 		error :

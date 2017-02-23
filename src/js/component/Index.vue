@@ -12,16 +12,16 @@
 
       <div class="card-block">
 
-        <h2 class="card-title">Login In</h2>
+		  <h2 class="card-title">{{conn}}</h2>
 
           <div class="form-group">
-            <label for="username"> Username</label>
+			  <label for="username"> {{log}}</label>
             <input class="form-control" type="text" v-model="login"
                    :placeholder="log" required autofocus>
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
+			  <label for="password">{{passwd}}</label>
             <input class="form-control" type="password" v-model="password"
                    :placeholder="passwd" required>
           </div>
@@ -43,7 +43,7 @@
 
       <div class="card-block">
 
-        <h2 class="card-title">Sign In</h2>
+		  <h2 class="card-title">{{creation}}</h2>
 
           <div class="form-group row">
 
@@ -64,7 +64,7 @@
           </div>
 
           <div class="form-group">
-            <label for="username">Username :</label>
+			  <label for="username">{{pseudo}} :</label>
             <input class="form-control" type="text" v-model="login"
                    :placeholder="log" required>
           </div>
@@ -78,7 +78,7 @@
           <div class="form-group row">
 
             <div class="col-md-12">
-              <label for="password">Password :</label>
+				<label for="password">{{passwd}} :</label>
             </div>
 
             <div class="form-group col-md-6">
@@ -99,7 +99,7 @@
       </div>
 
       <div class="card-footer text-muted">
-        <p> Already signed up? <a href="#" @click.prevent="shows(true)" >{{sign_in}}</a>
+		  <p> {{verif}} <a href="#" @click.prevent="shows(true)" >{{sign_in}}</a>
       </div>
 
     </div>
@@ -119,6 +119,10 @@ export default {
 		return {
 			login : "",
 			log : "",
+			conn : "",
+			verif : "",
+			pseudo : "",
+			creation : "",
 			password : "",
 			passwd : "",
 			sign_in : "",
@@ -174,6 +178,10 @@ export default {
 		},
 		init : function (){
 			this.log = auth.i18n("authentication.login")
+			this.conn = auth.i18n("authentication.connect")
+			this.verif = auth.i18n("authentication.sign_up")
+			this.pseudo = auth.i18n("authentication.pseudo")
+			this.creation = auth.i18n("authentication.creation")
 			this.passwd = auth.i18n("authentication.password")
 			this.sign_in = auth.i18n("authentication.sign_in")
 			this.create = auth.i18n("authentication.create")
