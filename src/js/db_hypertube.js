@@ -491,9 +491,9 @@ exports.get_Film_User = (decoded) =>{
 			else
 			{
 				db.collection("user").findOne({"username" : decoded.username, "email" : decoded.email}).then(data=>{
+					db.close()
 					if (!data)
 					{
-						db.close()
 						error("NO data found")
 					}
 					else
@@ -515,9 +515,7 @@ exports.get_Film = (params) =>{
 				db.collection("film").findOne({"code" : params["code"], "id" : params['id'], "imdb" : params['imdb']}).then(data=>{
 					db.close()
 					if (!data)
-					{
 						error("NO data found")
-					}
 					else
 						result(data);
 				}).catch(err=>{
