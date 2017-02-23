@@ -1,24 +1,40 @@
 <template>
-	<div>
-		<table>
-			<tr>
-			<div v-if="error">
-				<div class="alert alert-danger" role="alert">
-					{{error}}
-				</div>
-			</div>
-				<td>{{login}} : </td>
-				<td><input v-model="req_log" v-bind:placeholder="log"></td>
-			</tr>
-			<tr>
-				<td>{{email}} : </td>
-				<td><input v-model="req_mail" v-bind:placeholder="mail"></td>
-			</tr>
-			<tr>
-				<td> <button v-on:click="reset()">{{submit}}</button></td>
-			</tr>
-		</table>
-	</div>
+
+  <div id="content">
+
+    <div v-if="error">
+      <div class="alert alert-danger" role="alert">
+        {{error}}
+      </div>
+    </div>
+
+    <div class="col-xl-6 offset-xl-3">
+      <div class="card">
+
+      <div class="card-block">
+
+        <h2 class="card-title">Login In</h2>
+
+        <div class="form-group">
+          <label> {{ login }}</label>
+          <input class="form-control" v-model="req_log" type="text"
+                 :placeholder="log" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label>{{ email }}</label>
+          <input class="form-control" type="email"
+                 v-model="req_mail" :placeholder="mail" required>
+        </div>
+
+        <button class="btn btn-success" :disabled="disable" @click="reset()"> {{submit}}</button>
+
+      </div>
+
+    </div>
+    </div>
+
+  </div>
 </template>
 
 <script>
@@ -34,7 +50,8 @@ export default {
 		 mail : "",
 		 req_mail : "",
 		 submit : "",
-		 req_log : ""
+		 req_log : "",
+		 disable: false
 	 }
   },
   methods : {
@@ -58,7 +75,8 @@ export default {
 				this.error = auth.i18n("error.log")
 			else if (!this.isEmail(this.req_mail))
 				this.error = auth.i18n("error.email")
-			else
+			else {
+			  this.disable = true
 				this.$http.post('reset',{login : this.req_log,  mail : this.req_mail} ).then(res=>{
 					if (res.data.status == "ok")
 						this.$router.push("/")
@@ -66,10 +84,12 @@ export default {
 						this.error = "An error has occured with E-mail service"
 					else
 						this.error = auth.i18n("error.account")
+					this.disable = false
 				}).catch(err=>{
 					auth.logout();
 					app.redirect("/login")
 				})
+			}
 		}
 	},
 	mounted : function () {
