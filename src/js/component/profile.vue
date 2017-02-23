@@ -1,51 +1,86 @@
 <template>
-	<div>
-		<table>
-			<tr>
-				<td>{{login}} : </td>
-				<td>{{answer.login}}</td>
-			</tr>
-			<tr>
-				<td>{{first_name}} : </td>
-				<td><input v-model="firstName" v-bind:placeholder="answer.first_name"  ></td>
-			</tr>
-			<tr>
-				<td>{{last_name}} : </td>
-				<td><input v-model="lastName" v-bind:placeholder="answer.last_name"  ></td>
-			</tr>
-			<tr>
-				<td>{{email}} : </td>
-				<td><input v-model="email2" v-bind:placeholder="answer.email" ></td>
-			</tr>
-			<tr>
-				<td>{{langue}} : </td>
-				<td><select v-model="lang"  >
-						<option v-for="option in options" v-bind:value="option.value">
-						{{option.value}}
-						</option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>{{password}} : </td>
-				<td><input v-model="password2" type="password" ></td>
-			</tr>
-			<tr>
-				<td>{{conf_password}} : </td>
-				<td><input v-model="confirm_password"  type="password"></td>
-			</tr>
-		</table>
-			{{photo}} :
-			<div v-if="!image">
-				<h2>Select an image</h2>
-				<input type="file" @change="onFileChange">
-			</div>
-			<div v-else>
-				<img :src="image" />
-				<button @click="removeImage">Remove image</button>
-			</div>
-			<button @click="modifier()">{{modify}}</button>
+	<div id="content">
+    <div class="col-xl-8 offset-xl-2">
+
+      <div class="card">
+
+        <div class="card-block">
+
+          <h2 class="card-title">Profile</h2>
+
+          <div class="form-group row">
+
+            <div class="col-md-12">
+              <label>{{first_name}} / {{last_name}}:</label>
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="text" v-model="firstName"
+                     :placeholder="answer.first_name" autofocus>
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="text" v-model="lastName"
+                     :placeholder="answer.last_name">
+            </div>
+
+          </div>
+
+          <div class="form-group row">
+
+            <div class="form-group col-md-6">
+              <label for="email">{{ email }} :</label>
+              <input class="form-control" type="email" v-model="email2"
+                     :placeholder="answer.email">
+            </div>
+
+            <div class="form-group col-md-6">
+              <label>{{ langue }}:</label>
+              <select class="form-control" v-model="lang"  >
+                <option v-for="option in options" :value="option.value">
+                  {{option.value}}
+                </option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="form-group row">
+
+            <div class="col-md-12">
+              <label for="password">{{ password }} :</label>
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="password" v-model="password2">
+            </div>
+
+            <div class="form-group col-md-6">
+              <input class="form-control" type="password" v-model="confirm_password">
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            {{photo}} :
+            <div v-if="!image">
+              <h2>Select an image</h2>
+              <input type="file" @change="onFileChange">
+            </div>
+            <div v-else>
+              <img :src="image" height="200" width="240"/>
+              <button @click="removeImage">Remove image</button>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" @click="modifier()" >{{modify}}</button>
+
+        </div>
+
+      </div>
+    </div>
 	</div>
+
 </template>
 
 <script>

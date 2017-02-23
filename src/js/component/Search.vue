@@ -1,25 +1,24 @@
 <template>
 	<form id="film" @submit.prevent>
 		<div id="content">
-			<button @click="modif_profile()">{{profile}}</button>
-			<input v-model="req" v-bind:placeholder="search">
+			<input v-model="req" :placeholder="search">
 			<div>
 				<input v-model="nomFilm" placeholder="nom">
 				<select v-model="genre">
 					<option value="">genre</option>
-					<option v-for="option in options" v-bind:value="option.value">
+					<option v-for="option in options" :value="option.value">
 					{{option.value}}
 					</option>
 				</select>
 				<select v-model="minNote">
 					<option value="">note min</option>
-					<option v-for="min_note in min_notes" v-bind:value="min_note.value">
+					<option v-for="min_note in min_notes" :value="min_note.value">
 					{{min_note.value}}
 					</option>
 				</select>
 				<select v-model="maxNote">
 					<option value="">note max</option>
-					<option v-for="max_note in max_notes" v-bind:value="max_note.value">
+					<option v-for="max_note in max_notes" :value="max_note.value">
 					{{max_note.value}}
 					</option>
 				</select>
@@ -27,13 +26,13 @@
 				<input v-model="maxAnnee" placeholder="annee">
 				<select v-model="sort">
 					<option value="">sort by</option>
-					<option v-for="sort_by in sorts" v-bind:value="sort_by.value">
+					<option v-for="sort_by in sorts" :value="sort_by.value">
 					{{sort_by.text}}
 					</option>
 				</select>
 				<select v-model="order">
 					<option value="">order by</option>
-					<option v-for="order_by in orders" v-bind:value="order_by.value">
+					<option v-for="order_by in orders" :value="order_by.value">
 					{{order_by.value}}
 					</option>
 				</select>
@@ -45,7 +44,7 @@
 				<li v-for="item in answer">
 					<router-link v-bind:to="'search/'+item.imdb_code+'/'+item.id+'/'+item.code" @click="init()">
 						{{ item.title}} <br/>
-						<img v-bind:src=item.img />
+						<img :src=item.img />
 						<div v-show="item.vue">
 							<img src="../../img/check-mark.svg" alt="check" width=5%/>
 						</div>
@@ -170,7 +169,7 @@ export default {
 	500),
 	init : function() {
 	//	this.current_page = 0;
-	//	this.res_current = 0 
+	//	this.res_current = 0
 		this.error = ""
 		this.patiente = ""
 		this.search = auth.i18n("authentication.search")
@@ -314,14 +313,14 @@ export default {
 	},
 	mounted : function () {
 		this.current_page = 1;
-		this.res_current = 1 
+		this.res_current = 1
 		this.page();
 		$(window).scroll( () =>  {
 			if ($(document).height() - $(window).height() == $(window).scrollTop() && this.check && $(window).scrollTop() > 0) {
 				if (!this.avance)
 				{
 					this.current_page++
-					this.res_current = 1 
+					this.res_current = 1
 					this.page();
 				}
 				else

@@ -1,19 +1,38 @@
 <template>
-	<div>
-		{{error}}
-		<table>
-			<tr>
-				<td>{{password}} : </td>
-				<td><input type="password" v-model="req_pass" v-bind:placeholder="pass"></td>
-			</tr>
-			<tr>
-				<td>{{conf_password}} : </td>
-				<td><input type="password" v-model="req_conf_pass" v-bind:placeholder="conf_pass"></td>
-			</tr>
-			<tr>
-				<td> <button v-on:click="update()">{{modify}}</button></td>
-			</tr>
-		</table>
+	<div id="content">
+
+    <div v-if="error">
+      <div class="alert alert-danger" role="alert">
+        {{error}}
+      </div>
+    </div>
+
+    <div class="col-xl-6 offset-xl-3">
+      <div class="card">
+
+        <div class="card-block">
+
+          <h2 class="card-title">Login In</h2>
+
+          <div class="form-group">
+            <label> {{ password }}</label>
+            <input class="form-control" v-model="req_pass"
+                   type="password" :placeholder="pass" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label>{{conf_password}}</label>
+            <input class="form-control" type="password"
+                   v-model="req_conf_pass" :placeholder="conf_pass" required>
+          </div>
+
+          <button class="btn btn-success" @click="update()"> {{modify}}</button>
+
+        </div>
+
+      </div>
+    </div>
+
 	</div>
 </template>
 
