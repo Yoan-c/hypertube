@@ -41,6 +41,7 @@ export default {
 			msg : "testa",
 			see : false,
 			lien : "",
+			video : false,
 			imdb: "",
 			id : "",
 			code : "",
@@ -107,6 +108,7 @@ export default {
 			if (this.code == "Y")
 				mag = this.tab.magnet[this.picked]
 			this.$http.post("see", {magnet : mag , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
+
 				if (data && data.body && data.body.data)
 				{
 					this.$http.get("subtitle", {params : {imdb : this.imdb, token : token}}).then(res=>{
@@ -121,13 +123,14 @@ export default {
 					})
 				}
 				else
-					return
+					this.voir()
 			}).catch(err=>{
 				console.log("erreur seen", err)
 			})
 		},
 		init_player : function (data, subtitles){
-			let video = videojs('player', {
+			console.log("testARTRET")
+			let video = this.video = videojs('player', {
 				controls: true,
 				plugins: {
 					videoJsResolutionSwitcher: {
@@ -137,7 +140,7 @@ export default {
 				}
 			})
 
-			console.log(data)
+//			console.log(data)
 
 			video.duration = _ => Math.floor(data.duration)
 			video.oldCurrentTime = video.currentTime
@@ -166,11 +169,10 @@ export default {
 			if (this.code == "Y")
 				source = [{type : 'video/mp4', src:data.url, label : "Source"}, ...source]
 			video.updateSrc(source)
-				console.log(source)
 
 			for (let i in subtitles) {
 				let sub = subtitles[i]
-				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i }, true);
+				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
 			}
 			video.on('resolutionchange', _ => {
 				let resolution = video.currentResolution()
@@ -202,6 +204,10 @@ export default {
 		this.id = this.$route.params.id
 		this.search();
 	},
+	destroyed : function (){
+		console.log('destroy')
+		if (this.video) this.video.dispose()
+	}
 
 }
 

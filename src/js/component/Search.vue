@@ -332,6 +332,10 @@ export default {
 				}
 			}
 		});
+	},
+	destroyed : function(){
+		$(window).off("scroll");
+
 	}
 }
 </script>

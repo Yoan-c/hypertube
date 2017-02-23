@@ -226,10 +226,16 @@ exports.setProfile = (tab, params, jwt) =>{
 	return new Promise ((result, error)=>{
 		mongo.connect("mongodb://localhost:27017/hypertube", function(err, db){
 			if (err)
+			{
+				db.close()
 				error("open mongo failed in getProfile")
+			}
 			db.collection("user").findOne({"username" : tab.username, "email" : tab.email}).then(data=>{
 				if (!data)
+				{
+					db.close()
 					error("NO data found")
+				}
 				else
 				{
 					let token = jwt.sign({username : data.username , email : (params['email']) ? params['email'] : data.email}, "qwerty")
@@ -507,9 +513,9 @@ exports.get_Film = (params) =>{
 			else
 			{
 				db.collection("film").findOne({"code" : params["code"], "id" : params['id'], "imdb" : params['imdb']}).then(data=>{
+					db.close()
 					if (!data)
 					{
-						db.close()
 						error("NO data found")
 					}
 					else
@@ -531,6 +537,7 @@ exports.get_all_user = (decoded) =>{
 			else
 			{
 				data = db.collection("user").find().toArray((err, res)=>{
+					db.close()
 					if (res)
 					{
 						res.forEach(elem=>{
