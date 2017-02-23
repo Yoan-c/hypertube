@@ -103,10 +103,12 @@ exports.checkToken = (token) =>{
 		mongo.connect("mongodb://localhost:27017/hypertube", function (err, db){
 			if (err) error("erreur recherche de token")
 			db.collection("user").findOne({"tokens" : token}).then(data=>{
+				db.close();
 				if (data)
 					result(true)
 				error(false)
 			}).catch(err=>{
+				db.close();
 				error(false)
 			})
 		})

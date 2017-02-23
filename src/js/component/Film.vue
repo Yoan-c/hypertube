@@ -16,7 +16,7 @@
 			</div>
 		</div>
 		<div>
-			<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264" preload controls crossorigin="anonymous">
+				<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264" preload controls crossorigin="anonymous">
 			 	</video>
 			<p style="color: blue;" v-for="value in comments"> {{value.login}} {{value.comment}} </p>
 			<textarea v-model="comment" placeholder="comment"></textarea>
@@ -103,7 +103,10 @@ export default {
 		},
 		voir : function (){
 			let token = window.localStorage.getItem("token")
-			this.$http.post("see", {magnet : this.tab.magnet[this.picked] , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
+			let mag = this.tab.magnet
+			if (this.code == "Y")
+				mag = this.tab.magnet[this.picked]
+			this.$http.post("see", {magnet : mag , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
 				if (data && data.body && data.body.data)
 				{
 					this.$http.get("subtitle", {params : {imdb : this.imdb, token : token}}).then(res=>{
@@ -114,7 +117,7 @@ export default {
 					this.init_player(data.data.data, sub)
 						//	this.lien = "http://"+data.body.data.url
 					}).catch(err=>{
-						console.log("erreur ", err)
+						console.log("erreur", err)
 					})
 				}
 				else
@@ -138,45 +141,55 @@ export default {
 
 			video.duration = _ => Math.floor(data.duration)
 			video.oldCurrentTime = video.currentTime
+			video.tech_.oldCurrentTime = video.tech_.currentTime
 
 			let currentTime = time => {
 				if(time == undefined) {
-					return video.oldCurrentTime() + video.start;
+					return video.oldCurrentTime();
 				}
 
 				time = Math.floor(time)
 				video.start = time;
 
-				video.oldCurrentTime(time)
-
-				console.log(video.currentTime(), time, video.duration())
-
-				//let old_src = video.src().replace(/\?start=[\d]+/, '')
-				//video.src(old_src);
+				let old_src = video.src().replace(/\?start=[\d]+/, '')
+				video.src(old_src + '?start=' + time);
 				setTimeout(function() {
 					video.play();
 				}, 100);
 				return this;
 			}
 
-			video.currentTime = currentTime
-			
-			video.updateSrc(data.transcoded.map( (preset) => {
+			let source = data.transcoded.map( (preset) => {
 				return {type: 'video/webm', src: preset.stream, label: preset.quality}
-			}))
-
+			})
+			
+			if (this.code == "Y")
+				source = [{type : 'video/mp4', src:data.url, label : "Source"}, ...source]
+			video.updateSrc(source)
+				console.log(source)
 
 			for (let i in subtitles) {
 				let sub = subtitles[i]
 				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i }, true);
 			}
-
 			video.on('resolutionchange', _ => {
 				let resolution = video.currentResolution()
-				video.currentTime(video.currentTime())
+				// Save the current time
+				let ct = video.currentTime()
+				if (resolution.label != 'Source') {
+					video.currentTime = currentTime
+					video.tech_.currentTime = time => {
+						if (time == undefined) {
+							return video.tech_.oldCurrentTime() + video.start;
+						}
+						return video.tech_.oldCurrentTime(time)
+					}
+				} else {
+					video.currentTime = video.oldCurrentTime
+					video.tech_.currentTime = video.tech_.oldCurrentTime
+				}
+				video.currentTime(ct)
 			})
-
-			video.currentTime(1)
 		}
 	},
 	mounted : function () {
@@ -185,6 +198,7 @@ export default {
 		this.see = false
 		this.imdb = this.$route.params.imdb
 		this.code = this.$route.params.code
+		this.tab = []
 		this.id = this.$route.params.id
 		this.search();
 	},

@@ -16,7 +16,6 @@ let YTS = new RequestClient ({
 });
 
 var maxYTS = 0;
-
 let Info_file = {
 	"year" : "0",
 	"title" : "0",
@@ -40,6 +39,32 @@ let Info_file = {
 	"magnet" : null
 }
 
+function init_infoFile()
+{
+	Info_file = {
+	"year" : "0",
+	"title" : "0",
+	"imdb_code" : "0",
+	"note" : "0",
+	"time" : "0",
+	"actors" : "0",
+	"writer" : "0",
+	"poster" : "0",
+	"director" : "0",
+	"country" : "0",
+	"size" : "0",
+	"seeders" : "0",
+	"leechers" : "0",
+	"genre" : [],
+	"resume" : "0",
+	"small_img" : "0",
+	"medium_img" : "0",
+	"large_img" : "0",
+	"torrents" : [],
+	"magnet" : null
+	}
+}
+
 function getSubtitle(IMDB, title)
 {
 	var download = function(filename, url) {
@@ -51,6 +76,7 @@ function getSubtitle(IMDB, title)
 				response.on('end', function() {
 					var zip = new AdmZip(tmpFilePath)
 					zip.extractAllTo(filename)
+					console.log("filename ", tmpFilePath)
 					fs.unlink(tmpFilePath, (err) =>{
 						if (err)
 							console.log(err)
@@ -80,7 +106,6 @@ function getSubtitle(IMDB, title)
 			console.log("rep already subtitles exits")
 		})
 		fs.access("./subtitles/"+IMDB, fs.constants.R_OK | fs.constants.W_OK, (err) => {
-				console.log("data1")
 			fs.mkdir("./subtitles/"+IMDB, (err) =>{
 				if (!err)
 				{
@@ -94,14 +119,21 @@ function getSubtitle(IMDB, title)
 					}
 					else
 					{
+						let i;
 						opensubtitles.api.login().then(token =>{
 							opensubtitles.api.searchForTitle(token, "fre", title).done(subFr =>{
-								if (subFr && subFr[0] && subFr[0].ZipDownloadLink)
-								download("./subtitles/"+IMDB+"/fr", subFr[0].ZipDownloadLink)
+								for (i = 0 ; i < subFr.length; i++)
+									if (subFr[i].SubFileName.lastIndexOf('.srt') > 0)
+										break
+								if (subFr && subFr[i] && subFr[i].ZipDownloadLink)
+								download("./subtitles/"+IMDB+"/fr", subFr[i].ZipDownloadLink)
 							})
 							opensubtitles.api.searchForTitle(token, "eng", title).done(subEn =>{
-								if (subEn && subEn[0] && subEn[0].ZipDownloadLink)
-								download("./subtitles/"+IMDB+"/en", subEn[0].ZipDownloadLink)
+								for (i = 0 ; i < subEn.length; i++)
+									if (subEn[i].SubFileName.lastIndexOf('.srt') > 0)
+										break
+								if (subEn && subEn[i] && subEn[i].ZipDownloadLink)
+								download("./subtitles/"+IMDB+"/en", subEn[i].ZipDownloadLink)
 							})
 							opensubtitles.api.logout(token);
 						})
@@ -145,6 +177,7 @@ function Fill_infoFile(val, code)
 function getFile(id, code, IMDB)
 {
 	let tabFile = []
+	init_infoFile()
 	return new Promise ( (response, err) =>{
 
 		var reg = /^tt\d{7}$/

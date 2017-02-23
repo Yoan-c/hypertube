@@ -256,6 +256,7 @@ let server = http.createServer(function (req, res){
 					{
 						if (params && params["magnet"], params['code'] && params['imdb'] && params['id'])
 						{
+							//console.log("MMMMMMMMMMMMMMMMMMMMM  ", params["magnet"])
 							let code_Magnet = params["magnet"].split(":")
 							code_Magnet = code_Magnet[(code_Magnet.length -1)]
 							params["code_Magnet"] = code_Magnet;
