@@ -1,7 +1,7 @@
 <template>
-			{{msg}}
 	<div id="content" class="container">
-		<div class="row">
+
+		<div v-show="vue" class="row">
 
 			<div class="col col-6 col-md-4">
         <div class="card" style="max-width: 300px;">
@@ -35,17 +35,37 @@
 
         </div>
 
+        <button class="btn btn-primary" @click="voir">voir</button>
+
 			</div>
 
 		</div>
-		<div>
-				<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264" preload controls crossorigin="anonymous">
-			 	</video>
-			<p style="color: blue;" v-for="value in comments"> {{value.login}} {{value.comment}} </p>
-			<textarea v-model="comment" placeholder="comment"></textarea>
-			<button v-on:click="add">Add </button><br/>
-			<button v-show=vue v-on:click="voir">voir </button>
+
+		<div v-show="!vue">
+				<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264"
+               preload controls crossorigin="anonymous">
+        </video>
 		</div>
+
+    <div id="comment">
+
+      <div v-for="value in comments" :class="value.color" class="card card-inverse">
+        <div class="card-block">
+          <blockquote class="card-blockquote">
+            <p>{{value.comment}}</p>
+            <footer class="pull-right"><cite>{{value.login}}</cite></footer>
+          </blockquote>
+        </div>
+      </div>
+
+      <div class="input-group" style="margin-bottom:20px">
+        <label class="input-group-btn">
+            <button class="btn btn-primary" @click="add">Send</button>
+        </label>
+        <input type="text" class="form-control" placeholder="comment" v-model="comment">
+      </div>
+
+    </div>
 	</div>
 </template>
 
@@ -55,8 +75,8 @@ import app from '../app.js'
 export default {
 	data () {
 		return {
+		  color: ['card-primary', 'card-info', 'card-success', 'card-warning'],
 		  release : 0,
-			msg : "testa",
 			see : false,
 			vue : true,
 			lien : "",
@@ -105,7 +125,11 @@ export default {
 
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
-						this.comments.push({"comment" : elem.comment, "login" : elem.login})
+					  let color = this.color[Math.floor(Math.random() * this.color.length)]
+
+            console.log(color, this.color)
+
+						this.comments.push({"comment" : elem.comment, "login" : elem.login, color})
 					})
 				});
 			}, (response) =>{
@@ -116,9 +140,13 @@ export default {
 		},
 		add : function () {
 			let token = window.localStorage.getItem("token")
-			this.$http.post("http://localhost:8080/comment",{comment : this.comment, token : token , code : this.code, id : this.id, imdb : this.imdb})
-			this.comments.push(this.comment);
-			this.comment = ""
+			this.$http.post("comment",{comment : this.comment, token : token , code : this.code, id : this.id, imdb : this.imdb})
+
+      console.log('add')
+
+			let color = this.color[Math.floor(Math.random() * this.color.length)]
+			this.comments.push({"comment" : this.comment, "login" : 'you', color});
+			this.comment = ''
 		},
 		sub : function (en)
 		{
@@ -185,11 +213,12 @@ export default {
 			}
 
 			let source = data.transcoded.map( (preset) => {
-				return {type: 'video/webm', src: preset.stream, label: preset.quality}
+				return {type: 'video/webm', src: preset.stream.replace('localhost', 'e3r10p6.42.fr'), label: preset.quality}
 			})
 
 			if (this.code == "Y")
-				source = [{type : 'video/mp4', src:data.url, label : "Source"}, ...source]
+				source = [{type : 'video/mp4', src:data.url.replace('localhost', 'e3r10p6.42.fr'), label : "Source"}, ...source]
+
 			video.updateSrc(source)
 			video.on('error', e => {
 				if (video.error().code == 4) return
@@ -198,7 +227,7 @@ export default {
 
 			for (let i in subtitles) {
 				let sub = subtitles[i]
-				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
+				video.addRemoteTextTrack({ src: `http://e3r10p6.42.fr:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
 			}
 			video.on('resolutionchange', _ => {
 				let resolution = video.currentResolution()
