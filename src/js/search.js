@@ -202,6 +202,7 @@ function getFile(id, code, IMDB)
 					Info_file.size = res.data.movies[0].torrents[0].size;
 					Info_file.seeders = res.data.movies[0].torrents[0].seeds;
 					Info_file.leechers = res.data.movies[0].torrents[0].peers;
+					Info_file.bg_image = res.data.movies[0].background_image;
 					File_info.getById(IMDB).then( (val) => {
 						Fill_infoFile(val, "Y")
 						getSubtitle(IMDB, val.title)
@@ -222,6 +223,7 @@ function getFile(id, code, IMDB)
 				Info_file.leechers = data.leechers;
 				Info_file.title = data.name;
 				Info_file.magnet = data.magnetLink;
+				Info_file.bg_image = "";
 				let ID = data.id;
 				IMDB = reg2.exec(data.description);
 				if (IMDB)
@@ -456,6 +458,7 @@ function advance(params){
 			var i = 0;
 			if (res && res.data.movies)
 			{
+				console.log(res.data)
 				for (let j = 0; j < res.data.movies.length; j++)
 				{
 					let elem = res.data.movies[j];

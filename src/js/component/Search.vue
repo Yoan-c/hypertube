@@ -281,7 +281,7 @@ export default {
 		this.error = ""
 		this.current = 0;
 		this.$http.get("search", {params : {nom : this.res_nomFilm, genre : this.res_genre, minNote : this.res_minNote , maxNote : this.res_maxNote, minAnnee : this.res_minAnnee, maxAnnee : this.res_maxAnnee, sort : this.res_sort, order : this.res_order, page : this.res_current , av: 1}}).then(res =>{
-
+		
 		this.answer_avance = this.answer.concat(res.body.films)
 			if (res.body.size < 1)
 			{

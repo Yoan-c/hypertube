@@ -1,5 +1,6 @@
 <template>
 	<div id="content">
+		{{error}}
     <div class="col-xl-8 offset-xl-2">
 
       <div class="card">
@@ -171,26 +172,31 @@ export default {
 		},
 	modifier: function()
 		{
-			if ((this.password2 && !this.confirm_passwd || !this.password2 && this.confirm_passwd) || this.password2 && this.confirm_passwd && this.password2 != this.confirm_passwd)
+			if ((this.password2 && !this.confirm_password || !this.password2 && this.confirm_password) || this.password2 && this.confirm_password && this.password2 != this.confirm_password)
 				this.error = auth.i18n("error.password")
 			else
 			{
-				if (!this.email2 || (this.email2 && this.isEmail(this.email2)))
-				{
-					if (!(this.lang == "FR" || this.lang == "EN"))
-						this.lang = "EN"
-					localStorage.setItem("lang", this.lang);
-					let token = window.localStorage.getItem("token")
-			 		this.$http.post('info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.photo2, langue : this.lang, password : this.password2, token : token}).then(res =>{
-						window.localStorage.setItem("token", res.data.token)
-						this.$router.go(0)
- 					}).catch(err=>{
-						auth.logout();
-						app.redirect("/login")
- 					})
-				}
+				if (this.password2 && this.password2.length < 4)
+					this.error = auth.i18n("error.password_length")
 				else
-					this.error = auth.i18n("error.email")
+				{
+					if (!this.email2 || (this.email2 && this.isEmail(this.email2)))
+					{
+						if (!(this.lang == "FR" || this.lang == "EN"))
+							this.lang = "EN"
+						localStorage.setItem("lang", this.lang);
+						let token = window.localStorage.getItem("token")
+						this.$http.post('info_profile', {modif : true, first_name : this.firstName, last_name : this.lastName, email : this.email2, photo : this.image, langue : this.lang, password : this.password2, token : token}).then(res =>{
+							window.localStorage.setItem("token", res.data.token)
+							this.$router.go(0)
+						}).catch(err=>{
+							auth.logout();
+							app.redirect("/login")
+						})
+					}
+					else
+						this.error = auth.i18n("error.email")
+				}
 			}
 		}
 	},
