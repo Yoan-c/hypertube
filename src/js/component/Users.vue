@@ -54,7 +54,6 @@ export default {
 				else
 					this.answer = res.body.ret
 
-					console.log(this.answer)
 			}).catch(err=>{
 					auth.logout()
 					app.redirect("/login")

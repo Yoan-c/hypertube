@@ -479,6 +479,7 @@ exports.addFilm = (params, decoded) =>{
 						}
 					}
 				}).catch(err=>{
+					db.close()
 					error("false")
 				})
 			}
