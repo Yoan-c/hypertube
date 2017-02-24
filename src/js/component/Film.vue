@@ -44,17 +44,7 @@
 			<p style="color: blue;" v-for="value in comments"> {{value.login}} {{value.comment}} </p>
 			<textarea v-model="comment" placeholder="comment"></textarea>
 			<button v-on:click="add">Add </button><br/>
-<<<<<<< HEAD
-			<li v-for="(item, i) in torrent">
-		   	<input type="radio" id="i" v-bind:value="i" v-model="picked">
-			<label for="one">{{item.quality}}</label>
-			 <br>
-			 <em>seeds : {{item.seeds}} peers : {{item.peers}}</em>
-			</li>
-			 <button v-on:click="voir">voir </button>
-=======
 			<button v-show=vue v-on:click="voir">voir </button>
->>>>>>> a1df1632c3a53ef21c7a72161edca70f1cd1475f
 		</div>
 	</div>
 </template>
@@ -110,13 +100,9 @@ export default {
 					this.note = res.note+"/10"
 					this.info = this.released+" / "+this.time+" / "+this.genre
 					this.torrent = res.torrents
-<<<<<<< HEAD
 
 					this.release = new Date(res.released).getFullYear()
 
-=======
-					console.log(new Date(this.released).getFullYear())
->>>>>>> a1df1632c3a53ef21c7a72161edca70f1cd1475f
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
 						this.comments.push({"comment" : elem.comment, "login" : elem.login})
@@ -143,8 +129,8 @@ export default {
 			let token = window.localStorage.getItem("token")
 			let mag = this.tab.magnet
 			if (this.code == "Y")
-				mag = this.tab.magnet[this.picked]
-			console.log(this.tab.magnet[this.tab.magnet.length -1])
+				mag = this.tab.magnet[this.tab.magnet.length -1]
+
 			this.$http.post("see", {magnet : mag , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
 
 				if (data && data.body && data.body.data)
@@ -176,7 +162,7 @@ export default {
 					}
 				}
 			})
-			
+
 
 			video.duration = _ => Math.floor(data.duration)
 			video.oldCurrentTime = video.currentTime
@@ -209,7 +195,7 @@ export default {
 				if (video.error().code == 4) return
 				video.updateSrc(source)
 			})
-			
+
 			for (let i in subtitles) {
 				let sub = subtitles[i]
 				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
