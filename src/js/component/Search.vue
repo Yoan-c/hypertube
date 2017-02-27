@@ -16,7 +16,7 @@
             <div class="from group">
 
               <button class="btn btn-primary right" type="button" data-toggle="collapse" data-target="#finder" aria-expanded="false">
-                Advanced search
+                {{advancedSearch}}
               </button>
 
               <input class="form-control pull-right" style="width: 350px" v-model="req" :placeholder="search">
@@ -32,7 +32,7 @@
                   <div class="form-group">
 
                     <div class="form-group col-md-6">
-                      <input v-model="nomFilm" class="form-control" placeholder="nom" >
+                      <input v-model="nomFilm" class="form-control" :placeholder="nom" >
                     </div>
 
                     <div class="form-group col-md-2">
@@ -46,7 +46,7 @@
 
                     <div class="form-group col-md-2">
                       <select v-model="minNote" class="form-control">
-                        <option value="">note min</option>
+                        <option value="">{{ratingMi}}</option>
                         <option v-for="min_note in min_notes" :value="min_note.value">
                           {{min_note.value}}
                         </option>
@@ -55,7 +55,7 @@
 
                     <div class="form-group col-md-2">
                       <select v-model="maxNote" class="form-control">
-                        <option value="">note max</option>
+                        <option value="">{{ratingMa}}</option>
                         <option v-for="max_note in max_notes" :value="max_note.value">
                           {{max_note.value}}
                         </option>
@@ -65,16 +65,37 @@
                   </div>
 
                   <div class="form-group">
-                    <div class="form-group col-md-6">
-                      <input v-model="minAnnee" class="form-control" placeholder="annee">
+                    <div class="form-group col-md-3">
+                      <input v-model="minAnnee" class="form-control" :placeholder="anneeMi">
+                    </div>
+
+                    <div class="form-group col-md-3">
+                      <input v-model="maxAnnee" class="form-control" :placeholder="anneeMa">
+                    </div>
+
+
+                    <div class="form-group col-md-3">
+                      <select class="form-control" v-model="sort">
+                        <option value="">{{trie}}</option>
+                        <option v-for="sort_by in sorts" :value="sort_by.value">
+                          {{sort_by.text}}
+                        </option>
+                      </select>
                     </div>
 
                     <div class="form-group col-md-6">
-                      <input v-model="maxAnnee" class="form-control" placeholder="annee">
+                      <select class="form-control" v-model="order">
+                        <option value="">{{ordonnee}}</option>
+                        <option v-for="order_by in orders" :value="order_by.value">
+                          {{order_by.value}}
+                        </option>
+                      </select>
                     </div>
+
+
                   </div>
 
-                  <button class="btn btn-primary btn-block" @click="advanced_search()">recherche avance</button>
+                  <button class="btn btn-primary btn-block" @click="advanced_search()">{{advancedSearch}}</button>
 
                 </div>
 
@@ -115,10 +136,18 @@ export default {
 		 req : "",
 		 nomFilm : "",
 		 genre : "",
+		 nom : "",
 		 minNote : "",
 		 minAnnee : "",
 		 maxAnnee : "",
+		 anneeMi : "",
+		 anneeMa : "",
 		 maxNote : "",
+		 ratingMa : "",
+		 ratingMi : "",
+		 trie : "",
+		 ordonnee : "",
+		 advancedSearch : "",
 		 profile : "",
 		 error : "",
 		 patiente : "",
@@ -207,13 +236,13 @@ export default {
 							return (elem.id == data.id && elem.imdb == data.imdb_code && elem.code == data.code)
 						})
 						data.vue = val
-
 					})
 				}
 				else if (res.body.ret == "NO" || res.body.films.length == 0)
 					this.patiente = auth.i18n("error.empty_film")
 			}).catch(err=>{
-				console.log("err ", err)
+				//console.log("err ", err)
+				this.error = "error"
 			})
 	},
 	// This is the number of milliseconds we wait for the
@@ -227,6 +256,14 @@ export default {
 		this.search = auth.i18n("authentication.search")
 		this.log = auth.i18n("authentication.logout")
 		this.profile = auth.i18n("authentication.profile")
+		this.nom = auth.i18n("authentication.nom")
+		this.anneeMi = auth.i18n("search.yearMi")
+		this.anneeMa = auth.i18n("search.yearMa")
+		this.ratingMa = auth.i18n("search.noteMa")
+		this.ratingMi = auth.i18n("search.noteMi")
+		this.trie = auth.i18n("search.sort")
+		this.ordonnee = auth.i18n("search.order")
+		this.advancedSearch = auth.i18n("search.search")
 		for (let i = 1 ; i < 11; i++)
 		{
 			this.min_notes.push({value : i})
@@ -247,7 +284,6 @@ export default {
 					let val = res.film_vue.some(elem=>{
 						return (elem.id == data.id && elem.imdb == data.imdb_code && elem.code == data.code)
 					})
-
 					data.vue = val
 				})
 			});
@@ -322,7 +358,7 @@ export default {
 				}).catch(err=>{
 					this.current = 0;
 					this.current_page = 1;
-					console.log("errr ", err)
+				//	console.log("errr ", err)
 					//auth.logout();
 					//app.redirect("/login")
 				})

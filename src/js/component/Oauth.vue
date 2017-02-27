@@ -25,9 +25,8 @@ export default {
 		this.$http.post('oauth', {code : query.code, state: state}).then(data =>{
 				auth.log(data.data.token, "/search")
 			}).catch(err=>{
-			//	auth.logout();
-		//		app.redirect("/login")
-				console.log("errr ", err)
+				auth.logout();
+				app.redirect("/login")
 			})
 		},
 	},
