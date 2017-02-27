@@ -76,7 +76,6 @@ export default {
 					this.note = res.note+"/10"
 					this.info = this.released+" / "+this.time+" / "+this.genre
 					this.torrent = res.torrents
-					console.log(new Date(this.released).getFullYear())
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
 						this.comments.push({"comment" : elem.comment, "login" : elem.login})
@@ -103,8 +102,7 @@ export default {
 			let token = window.localStorage.getItem("token")
 			let mag = this.tab.magnet
 			if (this.code == "Y")
-				mag = this.tab.magnet[this.picked]
-			console.log(this.tab.magnet[this.tab.magnet.length -1])
+				mag = this.tab.magnet[this.tab.magnet.length -1]
 			this.$http.post("see", {magnet : mag , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
 
 				if (data && data.body && data.body.data)
@@ -118,12 +116,16 @@ export default {
 						//	this.lien = "http://"+data.body.data.url
 					}).catch(err=>{
 						console.log("erreur", err)
+						auth.logout();
+						app.redirect("/login")
 					})
 				}
 				else
 					this.voir()
 			}).catch(err=>{
-				console.log("erreur seen", err)
+				//console.log("erreur seen", err)
+				auth.logout();
+				app.redirect("/login")
 			})
 		},
 		init_player : function (data, subtitles){

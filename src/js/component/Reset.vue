@@ -74,7 +74,8 @@ export default {
 							localStorage.setItem("token", res.data.token)
 							this.$router.push("/")
 					}).catch(err=>{
-						console.log("Erreur reset");
+						auth.logout();
+						app.redirect("/login")
 					})
 				}
 				else

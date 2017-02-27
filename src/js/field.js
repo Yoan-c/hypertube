@@ -32,7 +32,15 @@ exports.field = {
 		search : {
 			end : "end of search",
 			users : "All users",
-			wait : "wait few seconds"
+			wait : "wait few seconds",
+			genre : "genre",
+			noteMa : "max rating",
+			noteMi : "min rating",
+			yearMi : "min year",
+			yearMa : "max year",
+			sort : "sort by",
+			order : "order by",
+			search : "advanced search"
 		},
 		error :
 		{
@@ -83,7 +91,15 @@ exports.field = {
 		search : {
 			end : "Fin de la recherche",
 			users : "utilisateurs",
-			wait : "Patientez quelques instants"
+			wait : "Patientez quelques instants",
+			genre : "genre",
+			noteMa : "note max",
+			noteMi : "note min",
+			yearMi : "annee min",
+			yearMa : "annee max",
+			sort : "trié par",
+			order : "ordonnée par",
+			search : "recherche avancée"
 		},
 		error :
 		{

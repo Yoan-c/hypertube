@@ -3,7 +3,7 @@
 		<div id="content">
 			<input v-model="req" :placeholder="search">
 			<div>
-				<input v-model="nomFilm" placeholder="nom">
+				<input v-model="nomFilm" :placeholder="nom">
 				<select v-model="genre">
 					<option value="">genre</option>
 					<option v-for="option in options" :value="option.value">
@@ -11,32 +11,32 @@
 					</option>
 				</select>
 				<select v-model="minNote">
-					<option value="">note min</option>
+					<option value="">{{ratingMi}}</option>
 					<option v-for="min_note in min_notes" :value="min_note.value">
 					{{min_note.value}}
 					</option>
 				</select>
 				<select v-model="maxNote">
-					<option value="">note max</option>
+					<option value="">{{ratingMa}}</option>
 					<option v-for="max_note in max_notes" :value="max_note.value">
 					{{max_note.value}}
 					</option>
 				</select>
-				<input v-model="minAnnee" placeholder="annee">
-				<input v-model="maxAnnee" placeholder="annee">
+				<input v-model="minAnnee" :placeholder="anneeMi">
+				<input v-model="maxAnnee" :placeholder="anneeMa">
 				<select v-model="sort">
-					<option value="">sort by</option>
+					<option value="">{{trie}}</option>
 					<option v-for="sort_by in sorts" :value="sort_by.value">
 					{{sort_by.text}}
 					</option>
 				</select>
 				<select v-model="order">
-					<option value="">order by</option>
+					<option value="">{{ordonnee}}</option>
 					<option v-for="order_by in orders" :value="order_by.value">
 					{{order_by.value}}
 					</option>
 				</select>
-				<button @click="advanced_search()">recherche avance</button>
+				<button @click="advanced_search()">{{advancedSearch}}</button>
 			</div>
 			<ul>
 				{{error}}
@@ -64,10 +64,18 @@ export default {
 		 req : "",
 		 nomFilm : "",
 		 genre : "",
+		 nom : "",
 		 minNote : "",
 		 minAnnee : "",
 		 maxAnnee : "",
+		 anneeMi : "",
+		 anneeMa : "",
 		 maxNote : "",
+		 ratingMa : "",
+		 ratingMi : "",
+		 trie : "",
+		 ordonnee : "",
+		 advancedSearch : "",
 		 profile : "",
 		 error : "",
 		 patiente : "",
@@ -161,7 +169,8 @@ export default {
 				else if (res.body.ret == "NO" || res.body.films.length == 0)
 					this.patiente = auth.i18n("error.empty_film")
 			}).catch(err=>{
-				console.log("err ", err)
+				//console.log("err ", err)
+				this.error = "error"
 			})
 	},
 	// This is the number of milliseconds we wait for the
@@ -175,6 +184,14 @@ export default {
 		this.search = auth.i18n("authentication.search")
 		this.log = auth.i18n("authentication.logout")
 		this.profile = auth.i18n("authentication.profile")
+		this.nom = auth.i18n("authentication.nom")
+		this.anneeMi = auth.i18n("search.yearMi")
+		this.anneeMa = auth.i18n("search.yearMa")
+		this.ratingMa = auth.i18n("search.noteMa")
+		this.ratingMi = auth.i18n("search.noteMi")
+		this.trie = auth.i18n("search.sort")
+		this.ordonnee = auth.i18n("search.order")
+		this.advancedSearch = auth.i18n("search.search")
 		for (let i = 1 ; i < 11; i++)
 		{
 			this.min_notes.push({value : i})
@@ -269,7 +286,7 @@ export default {
 				}).catch(err=>{
 					this.current = 0;
 					this.current_page = 1;
-					console.log("errr ", err)
+				//	console.log("errr ", err)
 					//auth.logout();
 					//app.redirect("/login")
 				})
