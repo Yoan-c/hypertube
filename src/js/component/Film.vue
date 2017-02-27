@@ -1,28 +1,71 @@
 <template>
-			{{msg}}
-	<div id="content">
-		<div>
-			<div>
-				<img v-bind:src=tab.img />
+	<div id="content" class="container">
+
+		<div v-show="vue" class="row">
+
+			<div class="col col-6 col-md-4">
+        <div class="card" style="max-width: 300px;">
+          <img class="card-img" :src="tab.poster" :alt="title">
+        </div>
 			</div>
-			<div>
-				{{title}}<br/>
-				{{info}}<br/>
-				{{director}}<br/>
-				{{writer}}<br/>
-				{{actors}}<br/>
-				{{resume}}<br/>
-				<p style="text : justify">	{{note}}</p>
+
+			<div class="col col-md-8">
+
+        <div class="card">
+
+          <div class="card-header">
+            {{title}}
+            <p class="card-text"><small class="text-muted">{{tab.genre}}</small></p>
+          </div>
+
+          <div class="card-block">
+            <p class="card-text">{{resume}}</p>
+          </div>
+
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">{{director}}</li>
+            <li class="list-group-item">{{writer}}</li>
+            <li class="list-group-item">{{actors}}</li>
+          </ul>
+
+          <div class="card-footer text-muted ">
+            {{note}}
+            <span class="pull-right">{{release}}</span>
+          </div>
+
+        </div>
+
+        <button class="btn btn-primary" @click="voir">voir</button>
+
 			</div>
+
 		</div>
-		<div>
-				<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264" preload controls crossorigin="anonymous">
-			 	</video>
-			<p style="color: blue;" v-for="value in comments"> {{value.login}} {{value.comment}} </p>
-			<textarea v-model="comment" placeholder="comment"></textarea>
-			<button v-on:click="add">Add </button><br/>
-			<button v-show=vue v-on:click="voir">voir </button>
+
+		<div v-show="!vue">
+				<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264"
+               preload controls crossorigin="anonymous">
+        </video>
 		</div>
+
+    <div id="comment">
+
+      <div v-for="value in comments" :class="value.color" class="card card-inverse">
+        <div class="card-block">
+          <blockquote class="card-blockquote">
+            <p>{{value.comment}}</p>
+            <footer class="pull-right"><cite>{{value.login}}</cite></footer>
+          </blockquote>
+        </div>
+      </div>
+
+      <div class="input-group" style="margin-bottom:20px">
+        <label class="input-group-btn">
+            <button class="btn btn-primary" @click="add">Send</button>
+        </label>
+        <input type="text" class="form-control" placeholder="comment" v-model="comment">
+      </div>
+
+    </div>
 	</div>
 </template>
 
@@ -32,7 +75,8 @@ import app from '../app.js'
 export default {
 	data () {
 		return {
-			msg : "testa",
+		  color: ['card-primary', 'card-info', 'card-success', 'card-warning'],
+		  release : 0,
 			see : false,
 			vue : true,
 			lien : "",
@@ -64,9 +108,9 @@ export default {
 			let token = window.localStorage.getItem("token")
 			vm.$http.get('search', {params : {imdb : this.imdb, code : this.code, id : this.id, token : token}} ).then((response) =>{
 				response.json().then((res)=>{
+
 					this.tab = res
 					this.title = res.title
-					this.released = res.released
 					this.time = res.time
 					this.genre = res.genre
 					this.director = "Director : "+res.director
@@ -76,9 +120,16 @@ export default {
 					this.note = res.note+"/10"
 					this.info = this.released+" / "+this.time+" / "+this.genre
 					this.torrent = res.torrents
+
+					this.release = new Date(res.released).getFullYear()
+					
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
-						this.comments.push({"comment" : elem.comment, "login" : elem.login})
+					  let color = this.color[Math.floor(Math.random() * this.color.length)]
+
+            console.log(color, this.color)
+
+						this.comments.push({"comment" : elem.comment, "login" : elem.login, color})
 					})
 				});
 			}, (response) =>{
@@ -89,9 +140,13 @@ export default {
 		},
 		add : function () {
 			let token = window.localStorage.getItem("token")
-			this.$http.post("http://localhost:8080/comment",{comment : this.comment, token : token , code : this.code, id : this.id, imdb : this.imdb})
-			this.comments.push(this.comment);
-			this.comment = ""
+			this.$http.post("comment",{comment : this.comment, token : token , code : this.code, id : this.id, imdb : this.imdb})
+
+      console.log('add')
+
+			let color = this.color[Math.floor(Math.random() * this.color.length)]
+			this.comments.push({"comment" : this.comment, "login" : 'you', color});
+			this.comment = ''
 		},
 		sub : function (en)
 		{
@@ -103,12 +158,13 @@ export default {
 			let mag = this.tab.magnet
 			if (this.code == "Y")
 				mag = this.tab.magnet[this.tab.magnet.length -1]
+			
 			this.$http.post("see", {magnet : mag , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
 
 				if (data && data.body && data.body.data)
 				{
 					this.$http.get("subtitle", {params : {imdb : this.imdb, token : token}}).then(res=>{
-					
+
 					let sub = res.data
 
 					this.see = true
@@ -138,7 +194,7 @@ export default {
 					}
 				}
 			})
-			
+
 
 			video.duration = _ => Math.floor(data.duration)
 			video.oldCurrentTime = video.currentTime
@@ -161,20 +217,21 @@ export default {
 			}
 
 			let source = data.transcoded.map( (preset) => {
-				return {type: 'video/webm', src: preset.stream, label: preset.quality}
+				return {type: 'video/webm', src: preset.stream.replace('localhost', 'e3r10p6.42.fr'), label: preset.quality}
 			})
-			
+
 			if (this.code == "Y")
-				source = [{type : 'video/mp4', src:data.url, label : "Source"}, ...source]
+				source = [{type : 'video/mp4', src:data.url.replace('localhost', 'e3r10p6.42.fr'), label : "Source"}, ...source]
+
 			video.updateSrc(source)
 			video.on('error', e => {
 				if (video.error().code == 4) return
 				video.updateSrc(source)
 			})
-			
+
 			for (let i in subtitles) {
 				let sub = subtitles[i]
-				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
+				video.addRemoteTextTrack({ src: `http://e3r10p6.42.fr:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
 			}
 			video.on('resolutionchange', _ => {
 				let resolution = video.currentResolution()
@@ -198,7 +255,7 @@ export default {
 	},
 	mounted : function () {
 		this.comments = []
-		this.comment = "" 
+		this.comment = ""
 		this.see = false
 		this.imdb = this.$route.params.imdb
 		this.code = this.$route.params.code
@@ -213,4 +270,14 @@ export default {
 }
 
 </script>
+
+
+<style>
+
+  .card-img {
+    max-height: 444px;
+    width: 100%; display: block;
+  }
+
+</style>
 
