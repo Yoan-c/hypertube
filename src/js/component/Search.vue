@@ -225,7 +225,7 @@ export default {
 			this.page()
 		}
 		else
-			vm.$http.get('http://localhost:8080/search',{params : {name : this.req, token : token}} ).then((res) =>{
+			vm.$http.get('search',{params : {name : this.req, token : token}} ).then((res) =>{
 				if (res.body && res.body.films)
 				{
 					this.patiente = ""

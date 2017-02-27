@@ -30,6 +30,7 @@ const default_lang = "EN"
 const tab_lang = ["FR", "EN"]
 let path_auto = ["/login", "/oauth/42/callback", "/oauth/google/callback", "/oauth/slack/callback", "/oauth/facebook/callback", "/oauth/github/callback", "/forget", "/reset"]
 
+// TODO url ici
 const api_url = 'http://e3r10p6.42.fr:8080'
 //const api_url = 'http://localhost:8080'
 
@@ -147,80 +148,6 @@ export default {
 	remove_token(){
 		localStorage.removeItem('token')
 	}
-	/*
-	login(context, redirect){
-		context.$http.post('http://localhost:8080/login', {create : false, login : context.login, password : context.password}).then(data =>
-			{
-				console.log("data ")
-				if (data.body.token)
-				{
-					window.localStorage.setItem("token", data.body.token)
-					window.localStorage.setItem("lang", data.body.lang)
-					if (redirect)
-						router.push(redirect)
-				}
-				console.log("data ", data.body)
-			}).catch(err =>{
-				console.log("errr trois ", err)
-			})
-	},
-	log(token, redirect){
-		if (token)
-		{
-			console.log("TOKEN "+ token)
-			window.localStorage.setItem("token", token)
-			if (redirect)
-				router.push(redirect)
-		}
-		else
-			router.push("/login")
-	},
-
-	signup(context, redirect){
-		context.$http.post("http://localhost:8080/login", {create : true, login : context.login, password : context.password, lastname : context.lastname, firstname : context.firstname, mail : context.mail, photo : context.photo}).then(data =>
-		{
-			console.log(data)
-			if (data.body.result)
-			{
-				localStorage.setItem("token", data.body.token)
-				console.log("compte bien cree")
-				if (redirect)
-					router.push(redirect)
-			}
-			else
-				console.log("le compte n'a pas ete cree " + data.body.data)
-		}).catch(err=>{
-			console.log("erreur lors de la creation de compte")
-		})
-	},
-	logout(){
-		localStorage.removeItem('token')
-		delete Vue.http.headers.common["Authorization"]
-		console.log("TEST")
-		router.push("/login")
-	},
-
-	getAuthHeader(){
-		return {
-			'Authorization' : 'Bearer ' + localStorage.getItem('token')
-		}
-	},
-	i18n(tab)
-	{
-		let lang = localStorage.getItem("lang");
-		return this._i18n(tab, (lang) ? lang : "EN");
-	},
-	_i18n (tab, lang){
-		let contents = tab.split(".")
-			let content = field.field[lang];
-		for (let index of contents){
-			if (content)
-				content = content[index]
-		}
-			if (!content)
-				return this._i18n(tab, default_lang)
-			return content
-	}*/
 }
 
 
