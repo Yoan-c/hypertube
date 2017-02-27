@@ -9,7 +9,7 @@
         </div>
 			</div>
 
-			<div class="col col-md-8">
+      <div class="col col-md-8">
 
         <div class="card">
 
@@ -35,19 +35,19 @@
 
         </div>
 
-        <button class="btn btn-primary" @click="voir">voir</button>
+      </div>
 
-			</div>
+      <button class="btn btn-secondary btn-lg btn-block" @click="voir">voir</button>
 
 		</div>
 
 		<div v-show="!vue">
-				<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" width="640" height="264"
+				<video id="player" class="video-js vjs-default-skin vjs-big-play-centered vjs-16-9"
                preload controls crossorigin="anonymous">
         </video>
 		</div>
 
-    <div id="comment">
+    <div id="comment" style="margin: 25px 0 25px 0;">
 
       <div v-for="value in comments" :class="value.color" class="card card-inverse">
         <div class="card-block">
@@ -58,11 +58,12 @@
         </div>
       </div>
 
-      <div class="input-group" style="margin-bottom:20px">
+      <div class="input-group">
         <label class="input-group-btn">
             <button class="btn btn-primary" @click="add">Send</button>
         </label>
-        <input type="text" class="form-control" placeholder="comment" v-model="comment">
+        <input type="text" class="form-control" @keyup.enter="add"
+               placeholder="comment" v-model="comment">
       </div>
 
     </div>
@@ -268,7 +269,11 @@ export default {
 </script>
 
 
-<style>
+<style lang="scss">
+
+  #player {
+    width: 100%;
+  }
 
   .card-img {
     max-height: 444px;

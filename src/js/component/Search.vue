@@ -1,55 +1,106 @@
 <template>
 	<form id="film" @submit.prevent>
 		<div id="content">
-			<input v-model="req" :placeholder="search">
-			<div>
-				<input v-model="nomFilm" placeholder="nom">
-				<select v-model="genre">
-					<option value="">genre</option>
-					<option v-for="option in options" :value="option.value">
-					{{option.value}}
-					</option>
-				</select>
-				<select v-model="minNote">
-					<option value="">note min</option>
-					<option v-for="min_note in min_notes" :value="min_note.value">
-					{{min_note.value}}
-					</option>
-				</select>
-				<select v-model="maxNote">
-					<option value="">note max</option>
-					<option v-for="max_note in max_notes" :value="max_note.value">
-					{{max_note.value}}
-					</option>
-				</select>
-				<input v-model="minAnnee" placeholder="annee">
-				<input v-model="maxAnnee" placeholder="annee">
-				<select v-model="sort">
-					<option value="">sort by</option>
-					<option v-for="sort_by in sorts" :value="sort_by.value">
-					{{sort_by.text}}
-					</option>
-				</select>
-				<select v-model="order">
-					<option value="">order by</option>
-					<option v-for="order_by in orders" :value="order_by.value">
-					{{order_by.value}}
-					</option>
-				</select>
-				<button @click="advanced_search()">recherche avance</button>
-			</div>
 			<ul>
-				{{error}}
-				{{patiente}}
-				<li v-for="item in answer">
-					<router-link v-bind:to="'search/'+item.imdb_code+'/'+item.id+'/'+item.code" @click="init()">
-						{{ item.title}} <br/>
-						<img :src=item.img />
-						<div v-show="item.vue">
-							<img src="../../img/check-mark.svg" alt="check" width=5%/>
-						</div>
-					</router-link>
-				</li>
+
+        <div v-if="error">
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+        </div>
+
+        <div class="card">
+
+          <div class="card-header">
+
+            <div class="from group">
+
+              <button class="btn btn-primary right" type="button" data-toggle="collapse" data-target="#finder" aria-expanded="false">
+                Advanced search
+              </button>
+
+              <input class="form-control pull-right" style="width: 350px" v-model="req" :placeholder="search">
+
+            </div>
+
+
+            <div class="collapse" id="finder">
+              <div class="form-option row">
+
+                <div class="container">
+
+                  <div class="form-group">
+
+                    <div class="form-group col-md-6">
+                      <input v-model="nomFilm" class="form-control" placeholder="nom" >
+                    </div>
+
+                    <div class="form-group col-md-2">
+                      <select v-model="genre" class="form-control">
+                        <option value="">genre</option>
+                        <option v-for="option in options" :value="option.value">
+                          {{option.value}}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                      <select v-model="minNote" class="form-control">
+                        <option value="">note min</option>
+                        <option v-for="min_note in min_notes" :value="min_note.value">
+                          {{min_note.value}}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                      <select v-model="maxNote" class="form-control">
+                        <option value="">note max</option>
+                        <option v-for="max_note in max_notes" :value="max_note.value">
+                          {{max_note.value}}
+                        </option>
+                      </select>
+                    </div>
+
+                  </div>
+
+                  <div class="form-group">
+                    <div class="form-group col-md-6">
+                      <input v-model="minAnnee" class="form-control" placeholder="annee">
+                    </div>
+
+                    <div class="form-group col-md-6">
+                      <input v-model="maxAnnee" class="form-control" placeholder="annee">
+                    </div>
+                  </div>
+
+                  <button class="btn btn-primary btn-block" @click="advanced_search()">recherche avance</button>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+				{{ patiente }}
+
+        <div v-for="film in answer" class="col-xl-3 col-lg-4 col-md-6">
+
+          <div class="card card-inverse">
+
+            <router-link v-bind:to="'search/'+film.imdb_code+'/'+film.id+'/'+film.code" @click="init()">
+
+              <img class="card-img poster" :class="{poster_green: film.vue}" :src=film.img :alt="film.title"/>
+
+            </router-link>
+
+          </div>
+
+        </div>
+
 			</ul>
 		</div>
 	</form>
@@ -156,6 +207,7 @@ export default {
 							return (elem.id == data.id && elem.imdb == data.imdb_code && elem.code == data.code)
 						})
 						data.vue = val
+
 					})
 				}
 				else if (res.body.ret == "NO" || res.body.films.length == 0)
@@ -195,6 +247,7 @@ export default {
 					let val = res.film_vue.some(elem=>{
 						return (elem.id == data.id && elem.imdb == data.imdb_code && elem.code == data.code)
 					})
+
 					data.vue = val
 				})
 			});
@@ -281,7 +334,7 @@ export default {
 		this.error = ""
 		this.current = 0;
 		this.$http.get("search", {params : {nom : this.res_nomFilm, genre : this.res_genre, minNote : this.res_minNote , maxNote : this.res_maxNote, minAnnee : this.res_minAnnee, maxAnnee : this.res_maxAnnee, sort : this.res_sort, order : this.res_order, page : this.res_current , av: 1}}).then(res =>{
-		
+
 		this.answer_avance = this.answer.concat(res.body.films)
 			if (res.body.size < 1)
 			{
@@ -338,4 +391,22 @@ export default {
 	}
 }
 </script>
+
+<style lang="scss">
+
+  .card {
+
+  }
+
+
+  .poster {
+    width: 230px;
+    height: 345px;
+  }
+
+  .poster_green {
+    border: 5px solid green;
+  }
+
+</style>
 

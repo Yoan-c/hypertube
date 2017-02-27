@@ -1,6 +1,12 @@
 <template>
 	<div id="content">
-		{{error}}
+
+    <div v-if="error">
+      <div class="alert alert-danger" role="alert">
+        {{error}}
+      </div>
+    </div>
+
     <div class="col-xl-8 offset-xl-2">
 
       <div class="card">
