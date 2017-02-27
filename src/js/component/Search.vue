@@ -83,7 +83,7 @@
                       </select>
                     </div>
 
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-3">
                       <select class="form-control" v-model="order">
                         <option value="">{{ordonnee}}</option>
                         <option v-for="order_by in orders" :value="order_by.value">

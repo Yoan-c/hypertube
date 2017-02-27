@@ -7,7 +7,7 @@
     </div>
   </div>
 
-  <div v-if="show" class="col-xl-6 offset-xl-3">
+  <div v-if="show" class="col-xl-8 offset-xl-2">
     <div class="card">
 
       <div class="card-block">
@@ -33,6 +33,36 @@
 
       <div class="card-footer">
         <a href="#" class="btn btn-link" @click.prevent="shows(false)">{{create}}</a>
+        <div class="pull-right">
+
+          <div class="col-md-12">
+
+              <a class="btn btn-school"
+                 href="https://api.intra.42.fr/oauth/authorize?client_id=8a8c56a0edca0a04a3e1b89b70ba2a4b79f03f2c07784856a8d21d89547d9039&redirect_uri=http%3A%2F%2Flocalhost%3A3002%2Foauth%2F42%2Fcallback&scope=public&response_type=code">
+                  42
+              </a>
+
+              <a class="btn btn-google"
+                 href="https://accounts.google.com/o/oauth2/v2/auth?scope=email%20profile&state=google&redirect_uri=http://localhost:3002/oauth/google/callback&response_type=code&client_id=161312720047-a6o6f6iss7u5vonsq8og5g31c0hqsh4n.apps.googleusercontent.com">
+                <span class="fa fa-google"></span>
+                Google
+              </a>
+
+              <a class="btn btn-slack"
+                 href="https://slack.com/oauth/authorize?scope=identity.basic,identity.email&client_id=3329266210.130370627137&state=slack">
+                <span class="fa fa-slack"></span>
+                Slack
+              </a>
+
+              <a class="btn btn-github"
+                 href="https://github.com/login/oauth/authorize?client_id=75c7e71cbfca78dbf304&redirect_uri=http://localhost:3002/oauth/github/callback&state=github">
+                <span class="fa fa-github"></span>
+                Github
+              </a>
+
+            </div>
+
+        </div>
       </div>
     </div>
   </div>
@@ -104,11 +134,6 @@
 
     </div>
   </div>
-
-  <a href="https://api.intra.42.fr/oauth/authorize?client_id=8a8c56a0edca0a04a3e1b89b70ba2a4b79f03f2c07784856a8d21d89547d9039&redirect_uri=http%3A%2F%2Flocalhost%3A3002%2Foauth%2F42%2Fcallback&scope=public&response_type=code" >42</a>
-  <a href="https://accounts.google.com/o/oauth2/v2/auth?scope=email%20profile&state=google&redirect_uri=http://localhost:3002/oauth/google/callback&response_type=code&client_id=161312720047-a6o6f6iss7u5vonsq8og5g31c0hqsh4n.apps.googleusercontent.com" >google</a>
-  <a href="https://slack.com/oauth/authorize?scope=identity.basic,identity.email&client_id=3329266210.130370627137&state=slack" >slack</a>
-  <a href="https://github.com/login/oauth/authorize?client_id=75c7e71cbfca78dbf304&redirect_uri=http://localhost:3002/oauth/github/callback&state=github" >github</a>
 </div>
 </template>
 
@@ -199,3 +224,49 @@ export default {
 
 }
 </script>
+
+
+<style lang="scss">
+
+  .btn-school {
+    background: #27384c;
+    color: white;
+
+    &:hover {
+      color: white;
+    }
+
+  }
+
+  .btn-google {
+    color: white;
+    background: #dd4b39;
+
+    &:hover {
+      color: white;
+    }
+  }
+
+  .btn-github {
+    color: white;
+    background: #444;
+
+    &:hover {
+      color: white;
+    }
+  }
+
+  .btn-slack {
+    color: black;
+    background: #ffffff;
+
+    &:hover {
+      color: black;
+    }
+  }
+
+  .btn-github, .btn-google, .btn-school, .btn-slack {
+    margin: 0 5px 0 5px;
+  }
+
+</style>

@@ -123,7 +123,7 @@ export default {
 					this.torrent = res.torrents
 
 					this.release = new Date(res.released).getFullYear()
-					
+
 					if (res && res.film && res.film.comment)
 					res.film.comment.forEach(elem=>{
 					  let color = this.color[Math.floor(Math.random() * this.color.length)]
@@ -159,7 +159,7 @@ export default {
 			let mag = this.tab.magnet
 			if (this.code == "Y")
 				mag = this.tab.magnet[this.tab.magnet.length -1]
-			
+
 			this.$http.post("see", {magnet : mag , token : token, code : this.code, imdb : this.imdb , id : this.id}).then(data=>{
 
 				if (data && data.body && data.body.data)
