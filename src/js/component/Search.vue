@@ -378,8 +378,6 @@ export default {
 				this.res_current++;
 				this.advanced_search()
 			}
-			else if (res.body.status == false)
-				console.log("FINI")
 			else
 				this.answer = this.answer_avance
 				this.film_vue = res.body.film_vue
@@ -390,7 +388,6 @@ export default {
 					data.vue = val
 				})
 		}).catch(err=>{
-			console.log("erreur ", err)
 			auth.logout();
 			app.redirect("/login")
 		})

@@ -128,8 +128,6 @@ export default {
 					res.film.comment.forEach(elem=>{
 					  let color = this.color[Math.floor(Math.random() * this.color.length)]
 
-            console.log(color, this.color)
-
 						this.comments.push({"comment" : elem.comment, "login" : elem.login, color})
 					})
 				});
@@ -143,15 +141,13 @@ export default {
 			let token = window.localStorage.getItem("token")
 			this.$http.post("comment",{comment : this.comment, token : token , code : this.code, id : this.id, imdb : this.imdb})
 
-      console.log('add')
-
 			let color = this.color[Math.floor(Math.random() * this.color.length)]
 			this.comments.push({"comment" : this.comment, "login" : 'you', color});
 			this.comment = ''
 		},
 		sub : function (en)
 		{
-			console.log("en ",en)
+			return true
 		},
 		voir : function (){
 			this.vue = false
@@ -172,7 +168,6 @@ export default {
 					this.init_player(data.data.data, sub)
 						//	this.lien = "http://"+data.body.data.url
 					}).catch(err=>{
-						console.log("erreur", err)
 						auth.logout();
 						app.redirect("/login")
 					})

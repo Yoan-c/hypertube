@@ -11,7 +11,7 @@ let opensubtitles = require("subtitler");
 
 let YTS = new RequestClient ({
 	baseUrl : "https://yts.ag/api/v2/",
-	debugRequest : true,
+	//debugRequest : true,
 	//debugResponse : true
 });
 
@@ -171,7 +171,7 @@ function Fill_infoFile(val, code)
 			Info_file.magnet[i] = uri;
 		}
 	}
-	return Info_file; 
+	return Info_file;
 }
 
 function getFile(id, code, IMDB)
@@ -230,7 +230,7 @@ function getFile(id, code, IMDB)
 				{
 					IMDB = IMDB[0]
 					Info_file.imdb_code = IMDB;
-					File_info.getById(IMDB).then( (val) => { 
+					File_info.getById(IMDB).then( (val) => {
 						Fill_infoFile(val, "P")
 						getSubtitle(IMDB, val.title)
 						Info_file.img = val.poster;
@@ -298,7 +298,7 @@ function getFile_by_page(number)
 						{
 							IMDB = (IMDB) ? IMDB[0] : "null"
 							let imdb_film = IMDB;
-							File_info.getById(IMDB).then( (val) => { 
+							File_info.getById(IMDB).then( (val) => {
 								tabFile.push({
 									id : result[j].id,
 									title : result[j].name,
@@ -394,8 +394,8 @@ function getFile_by_tag(name){
 										img : val.poster,
 										code : "P"
 									})
-									
-									if (tabFile.length == res.length + i - err 
+
+									if (tabFile.length == res.length + i - err
 										|| tabFile.length == MAX_RESULT)
 									{
 										return response(tabFile);
@@ -406,7 +406,7 @@ function getFile_by_tag(name){
 								err++ ;
 					//			console.log(err, res.length)
 							}
-							if (tabFile.length == res.length + i - err 
+							if (tabFile.length == res.length + i - err
 								|| tabFile.length == MAX_RESULT)
 							{
 					//			console.log("TESTiuprtghwi rtg " +j)
@@ -498,7 +498,7 @@ function advance(params){
 			}
 			response("NO")
 		})
-	
+
 	})
 
 }
@@ -512,9 +512,9 @@ exports.search_sub = (params, path) =>{
 		var filename = path.join(process.cwd(), Paths);
 		fs.exists(filename, exists => {
 				if(!exists)
-					yes("") 
+					yes("")
 			new Promise ((response, error) =>{
-				let lang_path = path.join(filename, 'en') 
+				let lang_path = path.join(filename, 'en')
 				fs.exists(lang_path, exists => {
 					if(!exists)
 						return response("")
@@ -525,10 +525,10 @@ exports.search_sub = (params, path) =>{
 			}).then(data =>{
 				//console.log("data sub ", data)
 				new Promise ((res, err) =>{
-					let lang_path = path.join(filename, 'fr') 
+					let lang_path = path.join(filename, 'fr')
 					fs.exists(lang_path, exists => {
 						if(!exists)
-						{ 
+						{
 							if (data)
 								return res({"en" : data})
 							else
@@ -543,7 +543,7 @@ exports.search_sub = (params, path) =>{
 					//console.log("response ", tab)
 					yes(tab)
 				})
-			
+
 			})
 		})
 	})

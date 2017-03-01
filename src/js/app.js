@@ -93,7 +93,6 @@ router.beforeEach((to, from, next)=>{
 	if (token)
 	{
 		Vue.http.headers.common["Authorization"] = "Bearer "+token
-		//console.log("router add " + Vue.http.headers.common["Authorization"])
 	}
 	else
 		delete Vue.http.headers.common["Authorization"]
