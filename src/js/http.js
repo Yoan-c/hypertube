@@ -71,7 +71,7 @@ var fill_data = (result, jwt, state, res) => {
 		res.write(JSON.stringify(response))
 		res.end()
 		}).catch(err=>{
-			console.log("erreur "+ err)
+			return false
 		})
 }
 
@@ -81,22 +81,9 @@ let server = http.createServer(function (req, res){
 	res.setHeader("Access-Control-Allow-Origin", "*");
 	res.setHeader("Content-Type", "application/json");
 	res.setHeader("Access-Control-Allow-Headers","Origin, Authorization, X-Requested-With, Content-Type, Accept");
-	
+
 	let query = url.parse(req.url).pathname;
-/*	var filename = path.join(process.cwd(), query);
-	fs.access(filename, function(exists) {
-		if(!exists) {
-			console.log("not exists: " + filename);
-		res.writeHead(200, {'Content-Type': 'text/plain'});
-		res.write('404 Not Found\n');
-			res.end();
-		}
-		var mimeType = mimeTypes[path.extname(filename).split(".")[1]];
-		res.writeHead(200, "text/plain");
-		var fileStream = fs.createReadStream(filename);
-		fileStream.pipe(res);
-	});
-*/	
+
 	let post = ''
 	req.setEncoding('utf8')
 	req.on("data", data => {
@@ -115,7 +102,6 @@ let server = http.createServer(function (req, res){
 				params = querystring.parse(post)
 				if (err)
 				{
-					console.log("erreur http checkTorrent")
 					res.writeHead(401, {'Content-Type': 'text/html'});
 					res.write('Erreur');
 					res.end()
@@ -142,7 +128,7 @@ let server = http.createServer(function (req, res){
 									res.write(JSON.stringify(result));
 									res.end();
 								}).catch(err=>{
-									result.film = "" 
+									result.film = ""
 									res.write(JSON.stringify(result));
 									res.end();
 								})
@@ -161,8 +147,8 @@ let server = http.createServer(function (req, res){
 									res.write(JSON.stringify(err));
 									res.end();
 								})
-							
-							
+
+
 							})
 						}
 						else if (params && Number(params['av']) && params['av'] == 1)
@@ -171,7 +157,7 @@ let server = http.createServer(function (req, res){
 								data.get_Film_User(decoded).then((result)=>{
 									if (resultat == "FIN" || resultat == "NO")
 										res.write(JSON.stringify({"ret" : resultat}));
-									else 
+									else
 										res.write(JSON.stringify({"films" : resultat, "film_vue" : result.film_vue}));
 									res.end();
 								}).catch(err=>{
@@ -199,7 +185,7 @@ let server = http.createServer(function (req, res){
 							}).catch(error=>{
 									res.write(JSON.stringify(error));
 									res.end();
-								
+
 							})
 						}
 					}
@@ -273,7 +259,7 @@ let server = http.createServer(function (req, res){
 								res.write(JSON.stringify({"err" : data}));
 								res.end();
 							})
-							
+
 						}
 						else
 							res.end();
@@ -341,11 +327,11 @@ let server = http.createServer(function (req, res){
 						mail.sendMail(params, data).then(response=>{
 							res.write(JSON.stringify({status : "ok"}))
 							res.end()
-							
+
 						}).catch(err =>{
 							res.write(JSON.stringify({status : "email"}))
 							res.end()
-							
+
 						})
 					}).catch(err=>{
 						res.end()
@@ -366,7 +352,6 @@ let server = http.createServer(function (req, res){
 						res.write(JSON.stringify({"token" : data}))
 						res.end()
 					}).catch(err=>{
-						console.log("erreur ", err)
 						res.write(JSON.stringify({"token" : ""}))
 						res.end()
 					})
@@ -420,9 +405,9 @@ let server = http.createServer(function (req, res){
 									let resultat = JSON.parse(result);
 									try {
 										resultat.email = JSON.parse(result2)[0].email
-									}catch (e)
+									} catch (e)
 									{
-										console.log("erreur recuperation email GITHUB "+ e)	
+                    resultat.email = 'invalid.email@hypertube.invalid'
 									}
 									fill_data(resultat, jwt, params['state'], res);
 								})
@@ -442,7 +427,7 @@ let server = http.createServer(function (req, res){
 							res.writeHead(200, {'Content-Type': 'text/plain'});
 							res.write('404 Not Found\n');
 							res.end();
-							return 
+							return
 						}
 						res.writeHead(200, "text/plain");
 						var fileStream = fs.createReadStream(filename);

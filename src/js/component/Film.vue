@@ -175,7 +175,6 @@ export default {
 				else
 					this.voir()
 			}).catch(err=>{
-				//console.log("erreur seen", err)
 				auth.logout();
 				app.redirect("/login")
 			})

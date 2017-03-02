@@ -22,7 +22,7 @@ export default {
 				context.error = this.i18n(data.body.err)
 			}
 		}).catch(err =>{
-			console.log("errr ", err)
+			return false
 		})
 	},
 		log(token, redirect){
@@ -47,7 +47,7 @@ export default {
 					app.redirect(redirect)
 			}
 					}).catch(err=>{
-			return true	
+			return true
 			})
 		},
 		logout(){

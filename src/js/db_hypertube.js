@@ -81,8 +81,6 @@ exports.userAutentication = (login, password, jwt) =>{
 						{"username" : data.username},
 						{
 							$set : {"tokens" : t }
-						}, (err, res) =>{
-							if (err) console.log("erreur update token")
 						})
 					db.close();
 					result({"token" : t, "lang" : data.langue})
@@ -95,7 +93,6 @@ exports.userAutentication = (login, password, jwt) =>{
 				}
 			}).catch(err=>{
 				db.close();
-				console.log(err)
 				error(" erreur user autentication");
 			})
 		})
@@ -176,8 +173,6 @@ exports.checkUserOAUTH = (params, jwt, state) =>{
 						{"username" : info["login"]},
 						{
 							$set : {"tokens" : t }
-						}, (err, res) =>{
-							if (err) console.log("erreur update OAUTH token")
 						})
 					db.close();
 					result(t)
@@ -563,11 +558,8 @@ exports.get_all_user = (decoded) =>{
 
 exports.check_film = _=>{
 	mongo.connect(mongo_url, function(err, db) {
-		if (err)
-		{
-			console.log("erreur db check_film")
-			return
-		}
+		if (err) return
+
 		db.collection("film").find().toArray((err, res)=>{
 			if (res)
 			{

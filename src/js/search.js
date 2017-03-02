@@ -76,12 +76,10 @@ function getSubtitle(IMDB, title)
 				response.on('end', function() {
 					var zip = new AdmZip(tmpFilePath)
 					zip.extractAllTo(filename)
-					console.log("filename ", tmpFilePath)
 					fs.unlink(tmpFilePath, (err) =>{
-						if (err)
-							console.log(err)
-						else
-						{
+						if (err) return
+
+
 							setTimeout(function (){fs.readdir(filename, (err, data) => {
 								var srtFile = data.filter((File) => {
 									return File.endsWith('.vtt')
@@ -90,20 +88,18 @@ function getSubtitle(IMDB, title)
 								{
 									if (name.lastIndexOf(".vtt") <= 0)
 										fs.unlink(filename+"/" + name, (err) =>{
-											if (err)
-												console.log(err)
+											if (err) return
 										})
 								})
 							})}, 500, srt_to_vtt(filename))
-						}
+
 					})
 				})
 			});
 	}
 	subtitle.searchSubtitles(["french", "english"], IMDB, function(data){
 		fs.mkdir("./subtitles", (err)=>{
-			if (err)
-			console.log("rep already subtitles exits")
+			if (err) return
 		})
 		fs.access("./subtitles/"+IMDB, fs.constants.R_OK | fs.constants.W_OK, (err) => {
 			fs.mkdir("./subtitles/"+IMDB, (err) =>{
@@ -111,7 +107,7 @@ function getSubtitle(IMDB, title)
 				{
 					if (data[IMDB])
 					{
-						console.log("data")
+
 								if (data[IMDB].french && data[IMDB].french.url)
 									download("./subtitles/"+IMDB+"/fr", data[IMDB].french.url)
 								if (data[IMDB].english && data[IMDB].english.url)
@@ -417,7 +413,7 @@ function getFile_by_tag(name){
 					if ((res && res.length == 0) || !res)
 						response("NO")
 				}).catch((err) =>{
-					console.log("err" + err);
+					return false
 				});
 			}
 			else
@@ -458,7 +454,6 @@ function advance(params){
 			var i = 0;
 			if (res && res.data.movies)
 			{
-				console.log(res.data)
 				for (let j = 0; j < res.data.movies.length; j++)
 				{
 					let elem = res.data.movies[j];

@@ -48,8 +48,6 @@ class StreamClient extends EventEmitter {
 	_listen () {
 		this.connection.on('message', message => {
 
-			console.log(message)
-
 			if (message.type == 'error') {
 				return this._onError(message.data)
 			}
