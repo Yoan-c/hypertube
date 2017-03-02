@@ -46,10 +46,8 @@ export default {
 				if (redirect)
 					app.redirect(redirect)
 			}
-				else
-				console.log("le compte n'a pas ete cree " + data.body.data)
 					}).catch(err=>{
-				console.log("erreur lors de la creation de compte")
+			return true	
 			})
 		},
 		logout(){

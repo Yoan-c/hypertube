@@ -31,8 +31,8 @@ const tab_lang = ["FR", "EN"]
 let path_auto = ["/login", "/oauth/42/callback", "/oauth/google/callback", "/oauth/slack/callback", "/oauth/facebook/callback", "/oauth/github/callback", "/forget", "/reset"]
 
 // TODO url ici
-const api_url = 'http://e3r10p6.42.fr:8080'
-//const api_url = 'http://localhost:8080'
+//const api_url = 'http://e3r10p6.42.fr:8080'
+const api_url = 'http://localhost:8080'
 
 Vue.http.options.root = api_url
 

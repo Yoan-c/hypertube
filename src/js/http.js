@@ -179,7 +179,6 @@ let server = http.createServer(function (req, res){
 									res.end();
 								})
 							}).catch(err=>{
-								console.log("rien trouve")
 								if (err == "fin")
 								res.write(JSON.stringify({status : false}));
 							res.end();
@@ -212,7 +211,6 @@ let server = http.createServer(function (req, res){
 								res.write(JSON.stringify(data));
 								res.end();
 							}).catch(err=>{
-								console.log("erreur "+ err)
 								res.end();
 							})
 						}
@@ -256,7 +254,6 @@ let server = http.createServer(function (req, res){
 					{
 						if (params && params["magnet"], params['code'] && params['imdb'] && params['id'])
 						{
-							//console.log("MMMMMMMMMMMMMMMMMMMMM  ", params["magnet"])
 							let code_Magnet = params["magnet"].split(":")
 							code_Magnet = code_Magnet[(code_Magnet.length -1)]
 							params["code_Magnet"] = code_Magnet;
@@ -283,26 +280,6 @@ let server = http.createServer(function (req, res){
 					}
 					else
 					{
-						/*query = url.parse(req.url).pathname;
-						var filename = path.join(process.cwd(), query);
-							console.log('request for', filename);
-						fs.exists(filename, function(exists) {
-							if(!exists) {
-								console.log("not exists: " + filename);
-								res.writeHead(200, {'Content-Type': 'text/plain'});
-								res.write('404 Not Found\n');
-								res.end();
-								return 
-							}
-
-							console.log('Found');
-
-							res.writeHead(200, "text/plain");
-							var fileStream = fs.createReadStream(filename);
-							fileStream.pipe(res);
-							res.write(JSON.stringify(response))
-						});
-						*/
 						res.writeHead(401, {'Content-Type': 'text/html'});
 						res.write('Erreur 401.');
 						res.end()
@@ -371,7 +348,6 @@ let server = http.createServer(function (req, res){
 							
 						})
 					}).catch(err=>{
-						console.log("erreur reset http ", err)
 						res.end()
 					})
 				}

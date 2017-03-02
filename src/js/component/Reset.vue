@@ -12,7 +12,7 @@
 
         <div class="card-block">
 
-          <h2 class="card-title">Login In</h2>
+          <h2 class="card-title">Reset password</h2>
 
           <div class="form-group">
             <label> {{ password }}</label>

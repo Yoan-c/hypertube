@@ -213,11 +213,11 @@ export default {
 			}
 
 			let source = data.transcoded.map( (preset) => {
-				return {type: 'video/webm', src: preset.stream.replace('localhost', 'e3r10p6.42.fr'), label: preset.quality}
+				return {type: 'video/webm', src: preset.stream, label: preset.quality}
 			})
 
 			if (this.code == "Y")
-				source = [{type : 'video/mp4', src:data.url.replace('localhost', 'e3r10p6.42.fr'), label : "Source"}, ...source]
+				source = [{type : 'video/mp4', src:data.url, label : "Source"}, ...source]
 
 			video.updateSrc(source)
 			video.on('error', e => {
@@ -227,7 +227,7 @@ export default {
 
 			for (let i in subtitles) {
 				let sub = subtitles[i]
-				video.addRemoteTextTrack({ src: `http://e3r10p6.42.fr:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
+				video.addRemoteTextTrack({ src: `http://localhost:8080/subtitles/${this.imdb}/${i}/${sub[0]}`, kind: 'subtitles', srclang: i, label: i, default:(i.toUpperCase() == window.localStorage.getItem("lang"))}, true);
 			}
 			video.on('resolutionchange', _ => {
 				let resolution = video.currentResolution()

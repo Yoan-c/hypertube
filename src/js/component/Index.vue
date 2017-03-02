@@ -129,7 +129,7 @@
       </div>
 
       <div class="card-footer text-muted">
-		  <p> {{verif}} <a href="#" @click.prevent="shows(true)" >{{sign_in}}</a>
+		  <p> {{verif}} <a href="#" @click.prevent="shows(true)" >{{conn}}</a></p>
       </div>
 
     </div>

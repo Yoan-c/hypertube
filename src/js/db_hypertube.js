@@ -5,8 +5,8 @@ let tab_fct = []
 let fs = require('fs');
 
 // TODO url ici
-const mongo_url = 'mongodb://e3r10p6.42.fr:27017/hypertube'
-//const mongo_url = 'mongodb://localhost:27017/hypertube'
+//const mongo_url = 'mongodb://e3r10p6.42.fr:27017/hypertube'
+const mongo_url = 'mongodb://localhost:27017/hypertube'
 
 exports.createUser = (tab_user, jwt) => {
 

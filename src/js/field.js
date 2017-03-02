@@ -5,7 +5,7 @@ exports.field = {
 	{
 		authentication :
 		{
-			connect : "Login In",
+			connect : "Log In",
 			pseudo : "Pseudo",
 			nom : "Name",
 			creation : "Sing In",
